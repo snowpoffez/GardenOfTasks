@@ -141,6 +141,9 @@ button, [role="button"], select, .modal-overlay {
   color: var(--col-text-header-muted);
   cursor: pointer;
   transition: color 0.15s ease, background-color 0.15s ease;
+  background: none;
+  border: none;
+  font-family: inherit;
 }
 .navbar-link:hover {
   color: var(--col-text-header);

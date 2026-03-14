@@ -96,14 +96,14 @@ function AddTaskPickModal({ onPickDaily, onPickTodo, onClose }) {
             className="w-full py-3 px-4 rounded-lg text-left font-medium btn-accent"
             onClick={onPickDaily}
           >
-            Dailies
+            Daily
           </button>
           <button
             type="button"
             className="w-full py-3 px-4 rounded-lg text-left font-medium btn-accent"
             onClick={onPickTodo}
           >
-            To Do&apos;s
+            To Do
           </button>
         </div>
       </div>
@@ -361,7 +361,15 @@ function DailyFormModal({ onSave, onClose }) {
   )
 }
 
-export default function TasksPage({
+function moveIndex(arr, fromIndex, toIndex) {
+  if (fromIndex === toIndex) return arr
+  const next = [...arr]
+  const [item] = next.splice(fromIndex, 1)
+  next.splice(toIndex, 0, item)
+  return next
+}
+
+export default function TaskPage({
   dailies,
   todos,
   todoTab,
@@ -379,6 +387,8 @@ export default function TasksPage({
   onTodoToggle,
   onUndo,
   canUndo,
+  onReorderDailies,
+  onReorderTodos,
 }) {
   const activeTodos = todos.filter((t) => !t.completed)
   const completedTodos = todos.filter((t) => t.completed)
@@ -425,8 +435,25 @@ export default function TasksPage({
                 </span>
               </div>
               <div className="space-y-3">
-                {dailies.map((d) => (
-                  <DailyCard key={d.id} daily={d} onToggle={onDailyToggle} />
+                {dailies.map((d, index) => (
+                  <div
+                    key={d.id}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = 'move'
+                      e.dataTransfer.setData('text/plain', String(index))
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      const from = parseInt(e.dataTransfer.getData('text/plain'), 10)
+                      if (Number.isNaN(from)) return
+                      onReorderDailies?.(from, index)
+                    }}
+                    className="cursor-grab active:cursor-grabbing"
+                  >
+                    <DailyCard daily={d} onToggle={onDailyToggle} />
+                  </div>
                 ))}
               </div>
             </section>
@@ -480,8 +507,28 @@ export default function TasksPage({
                   />
                 ) : (
                   <div className="space-y-2 mt-1">
-                    {displayedTodos.map((t) => (
-                      <TodoItem key={t.id} todo={t} onToggle={onTodoToggle} />
+                    {displayedTodos.map((t, index) => (
+                      <div
+                        key={t.id}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.effectAllowed = 'move'
+                          e.dataTransfer.setData('text/plain', String(index))
+                        }}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault()
+                          const from = parseInt(e.dataTransfer.getData('text/plain'), 10)
+                          if (Number.isNaN(from) || !onReorderTodos) return
+                          const displayedIds = displayedTodos.map((x) => x.id)
+                          const newDisplayedIds = moveIndex(displayedIds, from, index)
+                          const otherIds = todos.map((x) => x.id).filter((id) => !displayedIds.includes(id))
+                          onReorderTodos([...newDisplayedIds, ...otherIds])
+                        }}
+                        className="cursor-grab active:cursor-grabbing"
+                      >
+                        <TodoItem todo={t} onToggle={onTodoToggle} />
+                      </div>
                     ))}
                   </div>
                 )}

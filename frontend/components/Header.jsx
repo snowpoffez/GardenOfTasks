@@ -1,6 +1,8 @@
 import { User, CurrencyDollar } from '@phosphor-icons/react'
 
-export default function Header({ stats }) {
+const PAGES = { greenhouse: 'greenhouse', garden: 'garden', arboretum: 'arboretum' }
+
+export default function Header({ stats, currentPage, onNavigate }) {
   const { gold } = stats ?? {}
 
   return (
@@ -9,9 +11,27 @@ export default function Header({ stats }) {
         <div className="flex items-center gap-8">
           <span className="navbar-brand whitespace-nowrap">&gt; Garden of Tasks</span>
           <nav className="navbar-nav">
-            <span className="navbar-link navbar-link-active">The Greenhouse</span>
-            <span className="navbar-link">The Garden</span>
-            <span className="navbar-link">The Arboretum</span>
+            <button
+              type="button"
+              className={`navbar-link ${currentPage === PAGES.greenhouse ? 'navbar-link-active' : ''}`}
+              onClick={() => onNavigate(PAGES.greenhouse)}
+            >
+              The Greenhouse
+            </button>
+            <button
+              type="button"
+              className={`navbar-link ${currentPage === PAGES.garden ? 'navbar-link-active' : ''}`}
+              onClick={() => onNavigate(PAGES.garden)}
+            >
+              The Garden
+            </button>
+            <button
+              type="button"
+              className={`navbar-link ${currentPage === PAGES.arboretum ? 'navbar-link-active' : ''}`}
+              onClick={() => onNavigate(PAGES.arboretum)}
+            >
+              The Arboretum
+            </button>
           </nav>
         </div>
         <div className="flex items-center gap-3">

@@ -1,6 +1,10 @@
 import { useState, useCallback } from 'react'
 import Header from './components/Header'
-import TasksPage from './pages/TasksPage'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import TaskPage from './pages/TaskPage'
+import GamePage from './pages/GamePage'
+import StatPage from './pages/StatPage'
 
 const initialStats = {
   level: 5,
@@ -38,6 +42,9 @@ function App() {
   const [todoTab, setTodoTab] = useState('active')
   const [history, setHistory] = useState([])
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo'
+  const [currentPage, setCurrentPage] = useState('greenhouse') // 'greenhouse' | 'garden' | 'arboretum'
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [authView, setAuthView] = useState('home') // 'home' | 'login'
 
   const pushHistory = useCallback(() => {
     setHistory((prev) => [...prev, cloneState(dailies, todos)])
@@ -114,13 +121,54 @@ function App() {
     setHistory((prev) => prev.slice(0, -1))
   }, [history])
 
+  const handleReorderDailies = useCallback((fromIndex, toIndex) => {
+    if (fromIndex === toIndex) return
+    pushHistory()
+    setDailies((prev) => {
+      const next = [...prev]
+      const [item] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, item)
+      return next
+    })
+  }, [pushHistory])
+
+  const handleReorderTodos = useCallback((orderedIds) => {
+    pushHistory()
+    setTodos((prev) => {
+      const byId = Object.fromEntries(prev.map((t) => [t.id, t]))
+      return orderedIds.map((id) => byId[id]).filter(Boolean)
+    })
+  }, [pushHistory])
+
   const activeTodoCount = todos.filter((t) => !t.completed).length
   const incompleteDailyCount = dailies.filter((d) => !d.checked).length
 
+  const handleLoginSuccess = useCallback(() => {
+    setLoggedIn(true)
+    setCurrentPage('greenhouse')
+  }, [])
+
+  if (!loggedIn) {
+    return (
+      <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--col-bg-page)' }}>
+        {authView === 'home' && (
+          <HomePage onGoToLogin={() => setAuthView('login')} />
+        )}
+        {authView === 'login' && (
+          <LoginPage
+            onLoginSuccess={handleLoginSuccess}
+            onBack={() => setAuthView('home')}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--col-bg-page)' }}>
-      <Header stats={stats} />
-      <TasksPage
+      <Header stats={stats} currentPage={currentPage} onNavigate={setCurrentPage} />
+      {currentPage === 'greenhouse' && (
+      <TaskPage
         dailies={dailies}
         todos={todos}
         todoTab={todoTab}
@@ -138,7 +186,12 @@ function App() {
         onTodoToggle={handleTodoToggle}
         onUndo={handleUndo}
         canUndo={history.length > 0}
+        onReorderDailies={handleReorderDailies}
+        onReorderTodos={handleReorderTodos}
       />
+      )}
+      {currentPage === 'garden' && <GamePage />}
+      {currentPage === 'arboretum' && <StatPage />}
     </div>
   )
 }
