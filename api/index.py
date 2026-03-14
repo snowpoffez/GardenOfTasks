@@ -34,7 +34,7 @@ client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 class TaskCreate(BaseModel):
     user_id: int
     task_name: str
-    description: str | None = "No description provided"
+    description: str
     xp: int = 10
     status: str = "todo"
 
@@ -187,7 +187,7 @@ def create_task_route(task: TaskCreate):
         return create_task(
             task.user_id,
             task.task_name,
-            task.description or "No description provided",
+            task.description,
             task.xp,
             task.status,
         )
@@ -241,7 +241,7 @@ def create_daily_route(task: TaskCreate):  # Reusing TaskCreate schema since fie
         return create_daily(
             task.user_id,
             task.task_name,
-            task.description or "No description provided",
+            task.description,
             task.xp,
             task.status,
         )

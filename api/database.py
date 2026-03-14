@@ -132,7 +132,7 @@ def login_user(username: str, password: str):
         print(f"Database error: {e}")
         raise
 
-def create_task(user_id: int, task_name: str, description: str = "No description provided", xp: int = 10, status: str = "todo"):
+def create_task(user_id: int, task_name: str, description: str, xp: int = 10, status: str = "todo"):
     """
     Creates a new task.
     Returns dict with success, task_id or raises exception
@@ -201,7 +201,7 @@ def get_user_tasks(user_id: int):
         print(f"Database error: {e}")
         raise
 
-def create_daily(user_id: int, task_name: str, description: str = "No description provided", xp: int = 10, status: str = "todo"):
+def create_daily(user_id: int, task_name: str, description: str, xp: int = 10, status: str = "todo"):
     """
     Creates a new daily.
     Returns dict with success, daily_id or raises exception
