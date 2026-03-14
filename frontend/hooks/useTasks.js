@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
 import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds } from '../constants/tasks'
-import { useHistory } from './useHistory'
 
 export function useTasks(addGrowth, userId, onEarnXp) {
   const [dailies, setDailies] = useState([])
@@ -10,10 +9,6 @@ export function useTasks(addGrowth, userId, onEarnXp) {
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
   const [editingTodoId, setEditingTodoId] = useState(null)
   const [editingDailyId, setEditingDailyId] = useState(null)
-
-  const { push: pushHistory, undo: undoHistory, canUndo } = useHistory()
-
-  const push = useCallback((meta) => pushHistory(dailies, todos, dailyOrderIds, meta), [pushHistory, dailies, todos, dailyOrderIds])
 
   // Load tasks from backend on userId change (e.g. login/logout)
   useEffect(() => {
@@ -64,7 +59,6 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       onEarnXp?.(daily.rewardAmount ?? daily.damageAmount ?? 5)
       addGrowth(1)
     }
-    push({ lastToggledId: dailyId, lastToggledType: 'daily' })
 
     const newChecked = daily ? !daily.checked : false
     setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
@@ -77,10 +71,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
         body: JSON.stringify({ checked: newChecked }),
       }).catch((err) => console.error('Failed to update daily:', err))
     }
-  }, [push, dailies, addGrowth, onEarnXp, userId])
+  }, [dailies, addGrowth, onEarnXp, userId])
 
   const addDaily = useCallback(async (data) => {
-    push()
     const accentColor = DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)]
 
     if (userId) {
@@ -132,11 +125,10 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       setDailyOrderIds((prev) => [...prev, newId])
     }
     setAddTaskModal(null)
-  }, [push, userId])
+  }, [userId])
 
   const editDaily = useCallback((data) => {
     if (!editingDailyId) return
-    push()
     setDailies((prev) => prev.map((d) => d.id === editingDailyId ? {
       ...d,
       title: data.title ?? d.title,
@@ -150,28 +142,25 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       repeatUnit: data.repeatUnit ?? d.repeatUnit,
     } : d))
     setEditingDailyId(null)
-  }, [editingDailyId, push])
+  }, [editingDailyId])
 
   const resetDailies = useCallback(() => {
-    push()
     setDailies((prev) => prev.map((d) => ({ ...d, checked: false })))
-  }, [push])
+  }, [])
 
   const reorderDailies = useCallback((displayedIds, fromIndex, toIndex) => {
     if (fromIndex === toIndex || !displayedIds?.length) return
-    push()
     const movedId = displayedIds[fromIndex]
     const newOrder = displayedIds.filter((id) => id !== movedId)
     newOrder.splice(toIndex, 0, movedId)
     setDailyOrderIds(newOrder)
-  }, [push])
+  }, [])
 
   const deleteDaily = useCallback((id) => {
-    push()
     setDailies((prev) => prev.filter((d) => d.id !== id))
     setDailyOrderIds((prev) => prev.filter((orderId) => orderId !== id))
     setEditingDailyId(null)
-  }, [push])
+  }, [])
   // --- Todo actions ---
 
   const toggleTodo = useCallback((todoId) => {
@@ -181,7 +170,6 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       onEarnXp?.(todo.rewardAmount ?? todo.damageAmount ?? 5)
       addGrowth(2)
     }
-    push({ lastToggledId: todoId, lastToggledType: 'todo' })
 
     const newCompleted = !todo.completed
     setTodos((prev) => prev.map((t) => t.id === todoId ? { ...t, completed: newCompleted } : t))
@@ -195,10 +183,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
         body: JSON.stringify({ status: newCompleted ? 'completed' : 'todo' })
       }).catch(err => console.error('Failed to update task:', err))
     }
-  }, [push, todos, addGrowth, onEarnXp, userId])
+  }, [todos, addGrowth, onEarnXp, userId])
 
   const addTodo = useCallback(async (data) => {
-    push()
     const accentColor = DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)]
 
     if (userId) {
@@ -245,11 +232,10 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       }])
     }
     setAddTaskModal(null)
-  }, [push, userId])
+  }, [userId])
 
   const editTodo = useCallback((data) => {
     if (!editingTodoId) return
-    push()
     setTodos((prev) => prev.map((t) => t.id === editingTodoId ? {
       ...t,
       title: data.title || t.title,
@@ -261,50 +247,19 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       checklistItems: data.checklistItems ?? t.checklistItems ?? [],
     } : t))
     setEditingTodoId(null)
-  }, [editingTodoId, push])
+  }, [editingTodoId])
 
   const deleteTodo = useCallback((id) => {
-    push()
     setTodos((prev) => prev.filter((t) => t.id !== id))
     setEditingTodoId(null)
-  }, [push])
+  }, [])
 
   const reorderTodos = useCallback((orderedIds) => {
-    push()
     setTodos((prev) => {
       const byId = Object.fromEntries(prev.map((t) => [t.id, t]))
       return orderedIds.map((id) => byId[id]).filter(Boolean)
     })
-  }, [push])
-
-  // --- Undo (task-only: restores task state, does not affect garden; syncs backend to incomplete) ---
-
-  const undo = useCallback(() => {
-    undoHistory((snapshot, entry) => {
-      setDailies(snapshot.dailies)
-      setTodos(snapshot.todos)
-      if (snapshot.dailyOrderIds) setDailyOrderIds(snapshot.dailyOrderIds)
-      if (entry?.lastToggledId && entry?.lastToggledType && userId) {
-        const id = String(entry.lastToggledId)
-        const dbId = id.replace(/^(daily|todo)-/, '')
-        if (dbId && !Number.isNaN(Number(dbId))) {
-          if (entry.lastToggledType === 'daily') {
-            fetch(`/api/dailies/${dbId}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ checked: false }),
-            }).catch((err) => console.error('Failed to undo daily:', err))
-          } else if (entry.lastToggledType === 'todo') {
-            fetch(`/api/tasks/${dbId}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ status: 'todo' }),
-            }).catch((err) => console.error('Failed to undo todo:', err))
-          }
-        }
-      }
-    })
-  }, [undoHistory, userId])
+  }, [])
 
   // --- Modal helpers ---
 
@@ -318,11 +273,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     dailies, dailyOrderIds, todos, todoTab, setTodoTab,
     addTaskModal, setAddTaskModal,
     editingTodoId, editingDailyId,
-    canUndo,
     // actions
     toggleDaily, addDaily, editDaily, deleteDaily, resetDailies, reorderDailies,
     toggleTodo, addTodo, editTodo, deleteTodo, reorderTodos,
-    undo,
     openAddTask, closeAddTask, openEditTodo, openEditDaily, closeEdit,
   }
 }

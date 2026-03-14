@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CaretLeft, CaretRight, Package, TrendUp } from '@phosphor-icons/react'
+import { CaretDown, CaretRight, Package, TrendUp } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
 
 const QUEUE_GLOW_COUNT = 3
@@ -103,10 +103,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   }, [lastGrownSlots, onClearGrownSlots, onClearLastEarnedXp])
 
   return (
-    <div
-      className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6 overflow-auto relative"
-      style={{ backgroundColor: 'var(--col-bg-page)' }}
-    >
+    <div className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6 overflow-auto relative">
       {showDeselectOverlay && (
         <div className="garden-full-overlay" onClick={handleDeselect} aria-hidden />
       )}
@@ -144,7 +141,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
                           {label}
                         </span>
                         {isFullyGrown && (
-                          <span className="text-sm font-medium mt-1" style={{ color: 'var(--col-accent)' }}>
+                          <span className="text-sm font-medium mt-1 harvest-label">
                             Harvest
                           </span>
                         )}
@@ -176,7 +173,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
           >
             <TrendUp size={24} weight="bold" />
             <span className="garden-upgrades-toggle-label">Upgrades</span>
-            {upgradesOpen ? <CaretLeft size={20} /> : <CaretRight size={20} />}
+            {upgradesOpen ? <CaretDown size={20} /> : <CaretRight size={20} />}
           </button>
           {upgradesOpen && (
             <div className="garden-upgrades-box">
@@ -234,7 +231,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
           >
             <Package size={24} weight="bold" />
             <span className="garden-shop-toggle-label">Shop</span>
-            {shopOpen ? <CaretLeft size={20} /> : <CaretRight size={20} />}
+            {shopOpen ? <CaretDown size={20} /> : <CaretRight size={20} />}
           </button>
           {shopOpen && (
             <div className="garden-shop-box">

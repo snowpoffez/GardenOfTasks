@@ -114,7 +114,7 @@ function App() {
 
   if (!loggedIn) {
     return (
-      <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--col-bg-page)' }}>
+      <div className="app-page h-full flex flex-col">
         {authView === 'home' && (
           <HomePage
             onGoToLogin={() => setAuthView('login')}
@@ -129,7 +129,7 @@ function App() {
   }
 
   return (
-    <div className="h-full flex flex-col" style={{ backgroundColor: 'var(--col-bg-page)' }}>
+    <div className="app-page h-full flex flex-col">
       <Header
         user={user}
         stats={{ level: stats.level, xp: stats.xp, maxXp: stats.maxXp, gold: garden.coins }}
@@ -157,8 +157,6 @@ function App() {
           onPickDaily={() => tasks.setAddTaskModal('daily')}
           onPickGenerateAI={() => tasks.setAddTaskModal('generate-ai')}
           onTodoToggle={tasks.toggleTodo}
-          onUndo={tasks.undo}
-          canUndo={tasks.canUndo}
           onResetDailies={tasks.resetDailies}
           onReorderDailies={tasks.reorderDailies}
           onReorderTodos={tasks.reorderTodos}
