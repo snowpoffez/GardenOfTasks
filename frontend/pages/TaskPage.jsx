@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowCounterClockwise, Plus } from '@phosphor-icons/react'
+import { Plus } from '@phosphor-icons/react'
 import DailyCard from '../components/tasks/DailyCard'
 import TodoItem from '../components/tasks/TodoItem'
 import AddTaskPickModal from '../components/modals/AddTaskPickModal'
@@ -101,8 +101,6 @@ export default function TaskPage({
   onPickDaily,
   onPickGenerateAI,
   onTodoToggle,
-  onUndo,
-  canUndo,
   onResetDailies,
   onReorderDailies,
   onReorderTodos,
@@ -193,15 +191,6 @@ export default function TaskPage({
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium shadow btn-accent"
           >
             DEV: CRON
-          </button>
-          <button
-            type="button"
-            onClick={onUndo}
-            disabled={!canUndo}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium shadow ${canUndo ? 'btn-accent' : 'btn-disabled'}`}
-          >
-            <ArrowCounterClockwise size={18} weight="bold" />
-            Undo
           </button>
           <button
             type="button"

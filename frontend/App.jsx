@@ -157,8 +157,6 @@ function App() {
           onPickDaily={() => tasks.setAddTaskModal('daily')}
           onPickGenerateAI={() => tasks.setAddTaskModal('generate-ai')}
           onTodoToggle={tasks.toggleTodo}
-          onUndo={tasks.undo}
-          canUndo={tasks.canUndo}
           onResetDailies={tasks.resetDailies}
           onReorderDailies={tasks.reorderDailies}
           onReorderTodos={tasks.reorderTodos}
