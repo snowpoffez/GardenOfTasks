@@ -201,6 +201,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
           })
         })
         const saved = await res.json()
+        console.log('saved daily:', saved)
 
         // Use the real DB id
         setTodos((prev) => [...prev, {
