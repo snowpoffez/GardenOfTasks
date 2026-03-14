@@ -38,17 +38,6 @@ def init_db():
                     );
                 """)
 
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS dailies (
-                        id SERIAL PRIMARY KEY,
-                        user_id INTEGER NOT NULL,
-                        task_name TEXT NOT NULL,
-                        description TEXT,
-                        xp INTEGER DEFAULT 0,
-                        status TEXT DEFAULT 'todo'
-                    );
-                """)
-
                 print("✅ Tables initialized.")
 
                 # 3. Dailies table
