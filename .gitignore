@@ -90,3 +90,4 @@ dist/
 .env.production.local
 .venv
 .vercel
+.env*.local
