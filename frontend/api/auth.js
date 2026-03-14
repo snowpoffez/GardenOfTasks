@@ -63,3 +63,9 @@ export async function register(username, password) {
     throw wrapNetworkError(err)
   }
 }
+
+export async function checkUser(username) {
+  const res = await fetch(`${API_BASE}/api/check-user/${encodeURIComponent(username)}`)
+  const data = await res.json().catch(() => ({}))
+  return data.exists ?? false
+}

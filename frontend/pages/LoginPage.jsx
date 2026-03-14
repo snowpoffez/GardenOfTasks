@@ -1,12 +1,5 @@
 import { useState } from 'react'
-import { login, register } from '../api/auth'
-
-// Mock until backend has "check username" endpoint. Replace with API call later.
-function checkAccountExists(username) {
-  const trimmed = (username || '').trim().toLowerCase()
-  const existing = new Set(['test', 'user', 'demo'])
-  return existing.has(trimmed)
-}
+import { login, register, checkUser } from '../api/auth'
 
 export default function LoginPage({ onLoginSuccess, onBack }) {
   const [step, setStep] = useState('identify') // 'identify' | 'password' | 'signup'
@@ -16,19 +9,21 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleIdentifySubmit = (e) => {
+  const handleIdentifySubmit = async (e) => {
     e.preventDefault()
     setError('')
     const value = username.trim()
     if (!value) return
     setIsChecking(true)
-    // TODO: replace with API call when backend has GET /auth/check or similar
-    setTimeout(() => {
-      setIsChecking(false)
-      const exists = checkAccountExists(value)
+    try {
+      const exists = await checkUser(value)
       setStep(exists ? 'password' : 'signup')
       setPassword('')
-    }, 300)
+    } catch {
+      setError('Could not reach server')
+    } finally {
+      setIsChecking(false)
+    }
   }
 
   const handlePasswordSubmit = async (e) => {

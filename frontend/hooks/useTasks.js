@@ -89,7 +89,7 @@ export function useTasks(addGrowth) {
     push()
     const accentColor = DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)]
     setTodos((prev) => [...prev, {
-      id: `todo-${Date.now()}`,
+      id: crypto.randomUUID(),
       title: data.title || 'New task',
       completed: false,
       accentColor,
