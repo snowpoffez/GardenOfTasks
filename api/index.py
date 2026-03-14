@@ -50,6 +50,12 @@ class DailyUpdate(BaseModel):
     xp: int | None = None
     status: str | None = None
 
+class CurrencyRequest(BaseModel):
+    amount: int
+
+class XPIncrement(BaseModel):
+    xp_gain: int
+
 class AssignmentRequest(BaseModel):
     text: str
 
