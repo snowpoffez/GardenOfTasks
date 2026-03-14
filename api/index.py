@@ -112,21 +112,21 @@ async def germinate(request: AssignmentRequest):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-# @app.post("/api/register")
-# def create_user_route(payload: dict = Body(...)):
-#     """
-#     Receives username and password from React, 
-#     checks for duplicates, and creates a new user.
-#     """
-#     username = payload.get("username")
-#     password = payload.get("password")
+@app.post("/api/register")
+def create_user_route(payload: dict = Body(...)):
+    """
+    Receives username and password from React, 
+    checks for duplicates, and creates a new user.
+    """
+    username = payload.get("username")
+    password = payload.get("password")
 
-#     try:
-#         return create_user(username, password)
-#     except ValueError as e:
-#         raise HTTPException(status_code=400, detail=str(e))
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail="Internal Server Error")
+    try:
+        return create_user(username, password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @app.post("/api/login")
 def login_user_route(payload: dict = Body(...)):
