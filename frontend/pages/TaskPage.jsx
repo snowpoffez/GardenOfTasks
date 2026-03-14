@@ -101,7 +101,7 @@ export default function TaskPage({
             {/* Dailies column */}
             <section className="flex-1 flex flex-col min-w-0">
               <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-base font-semibold" style={{ color: 'var(--col-text-heading)' }}>Dailies</h2>
+                <h2 className="text-xl font-semibold" style={{ color: 'var(--col-text-heading)' }}>Dailies</h2>
                 <span
                   className="w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-medium"
                   style={{ backgroundColor: 'var(--col-accent)' }}
@@ -136,7 +136,7 @@ export default function TaskPage({
             {/* To Do's column */}
             <section className="flex-1 flex flex-col min-w-0">
               <div className="flex items-center gap-2 mb-3">
-                <h2 className="text-base font-semibold" style={{ color: 'var(--col-text-heading)' }}>To Do&apos;s</h2>
+                <h2 className="text-xl font-semibold" style={{ color: 'var(--col-text-heading)' }}>To Do&apos;s</h2>
                 <span
                   className="w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-medium"
                   style={{ backgroundColor: 'var(--col-accent)' }}

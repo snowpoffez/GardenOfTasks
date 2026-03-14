@@ -1,5 +1,4 @@
-
-test2
+# Garden of Tasks
 
 # Vite + React
 
@@ -42,3 +41,30 @@ To deploy this project to Vercel:
 4. The built files in the `dist` directory will be deployed.
 
 No additional configuration is needed for basic Vite projects on Vercel.
+
+---
+
+## Troubleshooting: "Can't reach the server" (login / sign up)
+
+That message means the **frontend cannot reach the backend API**. The app expects the API at **http://localhost:8000** unless you set `VITE_API_URL` in `frontend/.env`.
+
+### Fix: run the backend
+
+1. **Start the API** (from the project root):
+   ```bash
+   cd api
+   pip install -r requirements.txt
+   uvicorn index:app --reload --host 0.0.0.0 --port 8000
+   ```
+   Leave this terminal open. You should see something like `Uvicorn running on http://0.0.0.0:8000`.
+
+2. **Database**: The API uses PostgreSQL. Set one of these env vars (in `api/.env` or your shell) before starting uvicorn:
+   - `POSTGRES_URL` or `DATABASE_URL` — connection string, e.g. `postgresql://user:pass@localhost:5432/dbname`
+
+3. **Frontend**: Run the app as usual (`npm run dev`). It will call `http://localhost:8000` for login/register. If your API runs on another port or host, create `frontend/.env` with:
+   ```env
+   VITE_API_URL=http://localhost:YOUR_PORT
+   ```
+   Then restart `npm run dev`.
+
+4. **CORS**: The API allows `http://localhost:5173`. If your frontend runs on a different port, the backend must list it in `allow_origins` in `api/index.py`.
