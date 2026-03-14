@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { User, CurrencyDollar, CaretDown, UserCircle, Gear, SignOut } from '@phosphor-icons/react'
+import { formatCoins } from '../constants/garden'
 
 const PAGES = {
   greenhouse: 'greenhouse',
@@ -76,7 +77,7 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
           </span>
           <span className="navbar-gold">
             <CurrencyDollar size={18} weight="bold" />
-            {gold != null ? gold : '—'}
+            {gold != null ? formatCoins(gold, 3) : '—'}
           </span>
           <div className="relative" ref={dropdownRef}>
             <button

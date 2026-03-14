@@ -3,7 +3,7 @@ import { SEEDS_CATALOG, GARDEN_GRID_SIZE, HARVEST_PROFIT, MAX_GARDEN_SLOTS, getG
 
 export function useGarden() {
   const [garden, setGarden] = useState(() => ({
-    coins: 100,
+    coins: 1e16,
     slots: Array(GARDEN_GRID_SIZE).fill(null),
     growthQueue: [],
     lastGrownSlots: [],
@@ -15,6 +15,7 @@ export function useGarden() {
       slots = slots.map((s) => (s ? { ...s } : null))
       growthQueue = [...growthQueue]
       const grownSlots = []
+      let anyHarvestReady = false
       for (let i = 0; i < amount && growthQueue.length > 0; i++) {
         const slotIndex = growthQueue.shift()
         const plant = slots[slotIndex]
@@ -25,8 +26,10 @@ export function useGarden() {
         slots[slotIndex] = { ...plant, currentStage: newStage }
         grownSlots.push(slotIndex)
         growthQueue.push(slotIndex)
+        if (newStage >= seed.stages) anyHarvestReady = true
       }
-      return { ...prev, slots, growthQueue, lastGrownSlots: grownSlots }
+      // Only trigger navigate + animation when at least one crop became ready to harvest
+      return { ...prev, slots, growthQueue, lastGrownSlots: anyHarvestReady ? grownSlots : [] }
     })
   }, [])
 

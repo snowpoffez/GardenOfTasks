@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds, initialTodos } from '../constants/tasks'
+import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds } from '../constants/tasks'
 import { useHistory } from './useHistory'
 
 export function useTasks(addGrowth, userId, onEarnXp) {
@@ -11,9 +11,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
   const [editingTodoId, setEditingTodoId] = useState(null)
   const [editingDailyId, setEditingDailyId] = useState(null)
 
-  const { history, push: pushHistory, undo: undoHistory, canUndo } = useHistory()
+  const { push: pushHistory, undo: undoHistory, canUndo } = useHistory()
 
-  const push = useCallback(() => pushHistory(dailies, todos, dailyOrderIds), [pushHistory, dailies, todos, dailyOrderIds])
+  const push = useCallback((meta) => pushHistory(dailies, todos, dailyOrderIds, meta), [pushHistory, dailies, todos, dailyOrderIds])
 
   // Load tasks from backend on userId change (e.g. login/logout)
   useEffect(() => {
@@ -60,10 +60,24 @@ export function useTasks(addGrowth, userId, onEarnXp) {
 
   const toggleDaily = useCallback((dailyId) => {
     const daily = dailies.find((d) => d.id === dailyId)
-    if (daily && !daily.checked) addGrowth(1)
-    push()
-    setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: !d.checked } : d))
-  }, [push, dailies, addGrowth])
+    if (daily && !daily.checked) {
+      onEarnXp?.(daily.rewardAmount ?? daily.damageAmount ?? 5)
+      addGrowth(1)
+    }
+    push({ lastToggledId: dailyId, lastToggledType: 'daily' })
+
+    const newChecked = daily ? !daily.checked : false
+    setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
+
+    const dbId = dailyId.toString().replace('daily-', '')
+    if (userId && !isNaN(dbId)) {
+      fetch(`/api/dailies/${dbId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checked: newChecked }),
+      }).catch((err) => console.error('Failed to update daily:', err))
+    }
+  }, [push, dailies, addGrowth, onEarnXp, userId])
 
   const addDaily = useCallback(async (data) => {
     push()
@@ -167,7 +181,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       onEarnXp?.(todo.rewardAmount ?? todo.damageAmount ?? 5)
       addGrowth(2)
     }
-    push()
+    push({ lastToggledId: todoId, lastToggledType: 'todo' })
 
     const newCompleted = !todo.completed
     setTodos((prev) => prev.map((t) => t.id === todoId ? { ...t, completed: newCompleted } : t))
@@ -201,8 +215,6 @@ export function useTasks(addGrowth, userId, onEarnXp) {
           })
         })
         const saved = await res.json()
-        console.log('saved daily:', saved)
-
         // Use the real DB id
         setTodos((prev) => [...prev, {
           id: saved.task_id,  // ← real DB id
@@ -265,15 +277,34 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     })
   }, [push])
 
-  // --- Undo ---
+  // --- Undo (task-only: restores task state, does not affect garden; syncs backend to incomplete) ---
 
   const undo = useCallback(() => {
-    undoHistory((snapshot) => {
+    undoHistory((snapshot, entry) => {
       setDailies(snapshot.dailies)
       setTodos(snapshot.todos)
       if (snapshot.dailyOrderIds) setDailyOrderIds(snapshot.dailyOrderIds)
+      if (entry?.lastToggledId && entry?.lastToggledType && userId) {
+        const id = String(entry.lastToggledId)
+        const dbId = id.replace(/^(daily|todo)-/, '')
+        if (dbId && !Number.isNaN(Number(dbId))) {
+          if (entry.lastToggledType === 'daily') {
+            fetch(`/api/dailies/${dbId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ checked: false }),
+            }).catch((err) => console.error('Failed to undo daily:', err))
+          } else if (entry.lastToggledType === 'todo') {
+            fetch(`/api/tasks/${dbId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'todo' }),
+            }).catch((err) => console.error('Failed to undo todo:', err))
+          }
+        }
+      }
     })
-  }, [undoHistory])
+  }, [undoHistory, userId])
 
   // --- Modal helpers ---
 
