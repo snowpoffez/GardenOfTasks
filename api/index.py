@@ -5,7 +5,7 @@ from google import genai
 import psycopg
 import os
 from dotenv import load_dotenv
-from database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks
+from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks
 
 # Debug mode for saving API resources during development
 DEBUG_MODE = False # False in production to ensure full functionality
