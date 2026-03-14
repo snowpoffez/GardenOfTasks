@@ -20,6 +20,8 @@ export default defineConfig({
       '/api/users': 'http://localhost:8000',
       '/api/health': 'http://localhost:8000',
       '/api/check-user': 'http://localhost:8000',
+      '/api/users': 'http://localhost:8000',
+      '/api/plants': 'http://localhost:8000',
     }
   }
 })
