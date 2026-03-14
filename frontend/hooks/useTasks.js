@@ -34,14 +34,48 @@ export function useTasks(addGrowth, userId) {
       })
   }, [userId])
 
+  // Load dailies from backend on userId change (e.g. login/logout)
+  useEffect(() => {
+    if (!userId) return
+    fetch(`/api/dailies/${userId}`)
+        .then(res => res.json())
+        .then(dailies => {  
+            setDailies(dailies.map(d => ({
+                id: `daily-${d.id}`,
+                title: d.task_name,
+                checked: d.checked,
+                notes: d.description,
+                accentColor: d.accent_color || DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)],
+                repeatInterval: d.repeat_interval || 'Daily',
+                repeatEvery: d.repeat_every ?? 1,
+                repeatUnit: d.repeat_unit || 'day',
+                dueDate: d.due_date || '',
+                count: 0,
+            })))
+        })
+        .catch(err => console.error('Failed to load dailies:', err))
+  }, [userId])
+
   // --- Daily actions ---
 
   const toggleDaily = useCallback((dailyId) => {
     const daily = dailies.find((d) => d.id === dailyId)
-    if (daily && !daily.checked) addGrowth(1)
+    if (!daily) return
+    if (!daily.checked) addGrowth(1)
     push()
-    setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: !d.checked } : d))
-  }, [push, dailies, addGrowth])
+
+    const newChecked = !daily.checked
+    setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
+
+    const dbId = dailyId.toString().replace('daily-', '')
+    if (userId && !isNaN(dbId)) {
+        fetch(`/api/dailies/${dbId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ checked: newChecked })
+        }).catch(err => console.error('Failed to update daily:', err))
+    }
+  }, [push, dailies, addGrowth, userId])
 
   const addDaily = useCallback((data) => {
     push()
