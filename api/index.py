@@ -53,6 +53,12 @@ class DailyUpdate(BaseModel):
 class AssignmentRequest(BaseModel):
     text: str
 
+class CurrencyRequest(BaseModel):
+    amount: int
+
+class XPIncrement(BaseModel):
+    xp_gain: int
+
 # Initialize database on startup
 init_db()
 
@@ -131,8 +137,13 @@ async def germinate(request: AssignmentRequest):
                 contents=prompt
             )
 
-            raw_text = response.text or response.candidates[0].content.parts[0].text
-
+            raw_text = response.text
+            if not raw_text and response.candidates:
+                c = response.candidates[0]
+                if c.content and c.content.parts:
+                    raw_text = c.content.parts[0].text
+            if not raw_text:
+                raise HTTPException(status_code=500, detail="Empty response from model")
             cleaned_text = raw_text.replace("```json", "").replace("```", "").strip()
 
             import json
@@ -145,11 +156,11 @@ async def germinate(request: AssignmentRequest):
 @app.post("/api/register")
 def create_user_route(payload: dict = Body(...)):
     """
-    Receives username and password from React, 
+    Receives username and password from React,
     checks for duplicates, and creates a new user.
     """
-    username = payload.get("username")
-    password = payload.get("password")
+    username = payload.get("username") or ""
+    password = payload.get("password") or ""
 
     try:
         return create_user(username, password)
@@ -160,8 +171,8 @@ def create_user_route(payload: dict = Body(...)):
 
 @app.post("/api/login")
 def login_user_route(payload: dict = Body(...)):
-    username = payload.get("username")
-    password = payload.get("password")
+    username = payload.get("username") or ""
+    password = payload.get("password") or ""
 
     try:
         return login_user(username, password)
@@ -173,7 +184,13 @@ def login_user_route(payload: dict = Body(...)):
 @app.post("/api/tasks/createtask")
 def create_task_route(task: TaskCreate):
     try:
-        return create_task(task.user_id, task.task_name, task.description, task.xp, task.status)
+        return create_task(
+            task.user_id,
+            task.task_name,
+            task.description or "No description provided",
+            task.xp,
+            task.status,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail="Could not create task")
 
@@ -194,12 +211,13 @@ def get_user_tasks_route(user_id: int):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/api/check-user/{username}")
-
 def check_username_exists(username: str):
     """
     Checks if a username exists in the users table.
     Returns a dict with the existence status.
     """
+    if not DATABASE_URL:
+        raise HTTPException(status_code=500, detail="Database not configured")
     try:
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
@@ -218,9 +236,15 @@ def check_username_exists(username: str):
         raise
 
 @app.post("/api/dailies/createdaily")
-def create_daily_route(task: TaskCreate): # Reusing TaskCreate schema since fields match
+def create_daily_route(task: TaskCreate):  # Reusing TaskCreate schema since fields match
     try:
-        return create_daily(task.user_id, task.task_name, task.description, task.xp, task.status)
+        return create_daily(
+            task.user_id,
+            task.task_name,
+            task.description or "No description provided",
+            task.xp,
+            task.status,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail="Could not create daily")
 
@@ -263,9 +287,6 @@ def patch_task_route(task_id: int, payload: TaskUpdate):
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
-
-        class CurrencyRequest(BaseModel):
-    amount: int
 
 @app.post("/api/users/{user_id}/add-currency")
 def add_currency_route(user_id: int, payload: CurrencyRequest):
