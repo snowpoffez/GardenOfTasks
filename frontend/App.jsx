@@ -37,7 +37,7 @@ function getMaxXpForLevel(level) {
 }
 
 function App() {
-  const [stats, setStats] = useState(initialstats)
+  const [stats, setStats] = useState(initialStats)
   const [lastEarnedXp, setLastEarnedXp] = useState(null)
   const [pendingGardenNav, setPendingGardenNav] = useState(false)
   const { pathname } = useLocation()
