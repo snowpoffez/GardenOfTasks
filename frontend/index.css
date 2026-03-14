@@ -211,8 +211,17 @@ button, [role="button"], select, .modal-overlay {
 
 /* Navbar */
 .navbar {
-  background: radial-gradient(ellipse 100% 150% at 0% 50%, rgba(139, 92, 246, 0.28) 0%, transparent 55%),
-    radial-gradient(ellipse 100% 150% at 100% 50%, rgba(139, 92, 246, 0.28) 0%, transparent 55%),
+  background: linear-gradient(105deg,
+      rgba(139, 92, 246, 0.4) 0%,
+      rgba(139, 92, 246, 0.15) 18%,
+      transparent 38%),
+    linear-gradient(75deg,
+      transparent 48%,
+      rgba(139, 92, 246, 0.2) 55%,
+      rgba(139, 92, 246, 0.32) 62%,
+      rgba(139, 92, 246, 0.27) 70%,
+      rgba(139, 92, 246, 0.12) 77%,
+      transparent 100%),
     var(--col-bg-header);
   color: var(--col-text-header);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
