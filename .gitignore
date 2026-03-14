@@ -7,6 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Local scripts
+start.py
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -87,3 +90,4 @@ dist/
 .env.production.local
 .venv
 .vercel
+.env*.local
