@@ -2,8 +2,6 @@
 // Costs distributed so each category (fruits, veg, trees, wild) has low/medium/high.
 // repeatHarvest: when fully grown, harvest gives coins but plant stays (resets one stage for re-grow).
 
-const BEGINNER_COST_MIN = 10
-const BEGINNER_COST_MAX = 100
 const NON_STARTER_COST_MIN = 120
 const NON_STARTER_COST_MAX = 1e9
 
@@ -49,11 +47,11 @@ const wildIndices = shuffle([3, 7, 11, 15, 19, 23, 27, 31, 34, 35, 38, 39])
 
 export const SEEDS_CATALOG = [
   // —— Beginner (costs BEGINNER_COST_MIN–BEGINNER_COST_MAX) ——
-  { id: 'SF', name: 'Sunflower', cost: BEGINNER_COST_MIN, stages: 3, isStarter: true },
+  { id: 'SF', name: 'Sunflower', cost: 10, stages: 1, isStarter: true },
   { id: 'RD', name: 'Radish', cost: 25, stages: 2, isStarter: true },
   { id: 'LT', name: 'Lettuce', cost: 50, stages: 3, isStarter: true },
   { id: 'PE', name: 'Pea', cost: 75, stages: 4, isStarter: true, repeatHarvest: true },
-  { id: 'CH', name: 'Cherry', cost: BEGINNER_COST_MAX, stages: 4, isStarter: true, repeatHarvest: true },
+  { id: 'CH', name: 'Cherry', cost: 100, stages: 5, isStarter: true, repeatHarvest: true },
   // —— Fruits (spread of costs) ——
   { id: 'SB', name: 'Strawberry', cost: sortedNonStarter[fruitIndices[0]], stages: 5, isStarter: false, repeatHarvest: true },
   { id: 'AP', name: 'Apple', cost: sortedNonStarter[fruitIndices[1]], stages: 6, isStarter: false, repeatHarvest: true },

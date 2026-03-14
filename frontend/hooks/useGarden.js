@@ -6,6 +6,7 @@ export function useGarden() {
     coins: 100,
     slots: Array(GARDEN_GRID_SIZE).fill(null),
     growthQueue: [],
+    lastGrownSlots: [],
   }))
 
   const addGrowth = useCallback((amount) => {
@@ -13,6 +14,7 @@ export function useGarden() {
       let { slots, growthQueue } = prev
       slots = slots.map((s) => (s ? { ...s } : null))
       growthQueue = [...growthQueue]
+      const grownSlots = []
       for (let i = 0; i < amount && growthQueue.length > 0; i++) {
         const slotIndex = growthQueue.shift()
         const plant = slots[slotIndex]
@@ -21,10 +23,15 @@ export function useGarden() {
         if (!seed) continue
         const newStage = Math.min(plant.currentStage + 1, seed.stages)
         slots[slotIndex] = { ...plant, currentStage: newStage }
-        if (newStage >= seed.stages) growthQueue.push(slotIndex)
+        grownSlots.push(slotIndex)
+        growthQueue.push(slotIndex)
       }
-      return { ...prev, slots, growthQueue }
+      return { ...prev, slots, growthQueue, lastGrownSlots: grownSlots }
     })
+  }, [])
+
+  const clearLastGrownSlots = useCallback(() => {
+    setGarden((prev) => (prev.lastGrownSlots.length === 0 ? prev : { ...prev, lastGrownSlots: [] }))
   }, [])
 
   const plantSeed = useCallback((slotIndex, seedId) => {
@@ -72,5 +79,5 @@ export function useGarden() {
     })
   }, [])
 
-  return { garden, addGrowth, plantSeed, harvest, buyUpgrade }
+  return { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots }
 }

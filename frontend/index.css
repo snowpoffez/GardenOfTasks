@@ -455,16 +455,73 @@ button, [role="button"], select, .modal-overlay {
 .garden-slot-harvest {
   box-shadow: 0 0 0 3px var(--col-green-600), 0 0 20px rgba(245, 158, 11, 0.6);
 }
+
+@keyframes garden-slot-open-shop-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--col-accent);
+  }
+  40% {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 6px var(--col-accent), 0 0 20px var(--col-accent);
+  }
+  70% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 2px var(--col-accent), 0 0 12px var(--col-accent);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.garden-slot-open-shop {
+  animation: garden-slot-open-shop-pulse 0.45s ease-out forwards;
+  pointer-events: none;
+}
+.garden-slot-open-shop:hover {
+  transform: none;
+}
+
+@keyframes garden-slot-grow-pop {
+  0% {
+    transform: scale(0.85);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.garden-slot-grow-pop {
+  transform-origin: bottom center;
+  animation: garden-slot-grow-pop 0.4s ease-out forwards;
+}
+.garden-slot-grow-pop:hover {
+  transform: none;
+}
+
 .garden-coins {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
+}
+@keyframes garden-shop-box-in {
+  from {
+    opacity: 0;
+    transform: translateX(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .garden-shop-box {
   border-radius: 0.75rem;
   border: 1px solid var(--col-border);
   background-color: var(--col-bg-card);
   padding: 1.25rem 1.25rem;
+  animation: garden-shop-box-in 0.25s ease-out;
 }
 .garden-shop-seed-list {
   max-height: min(20rem, 50vh);
@@ -495,6 +552,21 @@ button, [role="button"], select, .modal-overlay {
   border: 1px solid var(--col-border);
   background-color: var(--col-bg-card);
   padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.garden-shop-card span:first-of-type {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.garden-shop-card span:last-of-type {
+  flex-shrink: 0;
 }
 .garden-shop-card:disabled,
 .garden-shop-card.btn-disabled {
@@ -506,18 +578,22 @@ button, [role="button"], select, .modal-overlay {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  transition: width 0.2s ease;
+  position: relative;
 }
-.garden-shop-sidebar-collapsed {
+.garden-shop-sidebar-collapsed,
+.garden-shop-sidebar-open {
   width: auto;
 }
-.garden-shop-sidebar-open {
-  width: 100%;
-}
-@media (min-width: 640px) {
-  .garden-shop-sidebar-open {
-    width: 16rem;
-  }
+.garden-shop-sidebar-open .garden-shop-box {
+  position: absolute;
+  right: 100%;
+  top: 0;
+  margin-right: 0.5rem;
+  width: 24rem;
+  max-width: min(24rem, calc(100vw - 12rem));
+  z-index: 30;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .garden-shop-toggle {
   display: flex;
@@ -535,7 +611,7 @@ button, [role="button"], select, .modal-overlay {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .garden-shop-sidebar-open .garden-shop-toggle {
-  width: 100%;
+  width: auto;
 }
 .garden-shop-toggle:hover {
   background-color: var(--col-bg-hover, rgba(0, 0, 0, 0.04));
@@ -556,18 +632,21 @@ button, [role="button"], select, .modal-overlay {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  transition: width 0.2s ease;
+  position: relative;
 }
-.garden-upgrades-sidebar-collapsed {
+.garden-upgrades-sidebar-collapsed,
+.garden-upgrades-sidebar-open {
   width: auto;
 }
-.garden-upgrades-sidebar-open {
-  width: 100%;
-}
-@media (min-width: 640px) {
-  .garden-upgrades-sidebar-open {
-    width: 14rem;
-  }
+.garden-upgrades-sidebar-open .garden-upgrades-box {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 0.5rem;
+  width: 14rem;
+  z-index: 30;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .garden-upgrades-toggle {
   display: flex;
@@ -585,7 +664,7 @@ button, [role="button"], select, .modal-overlay {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .garden-upgrades-sidebar-open .garden-upgrades-toggle {
-  width: 100%;
+  width: auto;
 }
 .garden-upgrades-toggle:hover {
   background-color: var(--col-bg-hover, rgba(0, 0, 0, 0.04));
@@ -672,4 +751,48 @@ button, [role="button"], select, .modal-overlay {
 .garden-popup-warn .modal-header {
   background-color: var(--col-warn-text);
   color: white;
+}
+
+/* Garden slot wrapper (for XP float positioning) */
+.garden-slot-wrapper {
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* XP float beside plant: drifts up and slightly sideways, fades */
+@keyframes xp-float {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-2.5rem) translateX(-0.6rem);
+  }
+}
+.xp-float {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  margin-left: 0.35rem;
+  z-index: 10;
+  pointer-events: none;
+  animation: xp-float 1.2s ease-out forwards;
+}
+.xp-float-inner {
+  display: inline-block;
+  padding: 0.25rem 0.5rem 0.25rem 0.4rem;
+  background: linear-gradient(135deg, var(--col-green-600) 0%, var(--col-green-700) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
