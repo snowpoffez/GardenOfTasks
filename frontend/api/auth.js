@@ -3,7 +3,7 @@
  * Set VITE_API_URL in .env (e.g. http://localhost:8000) or we default to localhost:8000.
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 function getDetailMessage(detail, fallback) {
   if (detail == null) return fallback

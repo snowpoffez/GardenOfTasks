@@ -9,5 +9,15 @@ export default defineConfig({
   build: {
     outDir: '../dist', 
     emptyOutDir: true,
+  },
+  server: {
+    proxy: {
+      '/api/germinate': 'http://localhost:8000',
+      '/api/login': 'http://localhost:8000',
+      '/api/register': 'http://localhost:8000',
+      '/api/tasks': 'http://localhost:8000',
+      '/api/health': 'http://localhost:8000',
+      '/api/check-user': 'http://localhost:8000',
+    }
   }
 })

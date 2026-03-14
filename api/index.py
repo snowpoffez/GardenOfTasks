@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks
 
 # Debug mode for saving API resources during development
-DEBUG_MODE = True # False in production to ensure full functionality
+DEBUG_MODE = False # False in production to ensure full functionality
 
 # Load local .env file (Vercel CLI also handles this automatically)
 load_dotenv(".env.local")
@@ -74,7 +74,7 @@ async def germinate(request: AssignmentRequest):
     else:
         try:
             prompt = f"""
-            Break the following assignment into any number of nature-themed tasks that you see fit: "History Essay"
+            Break the following assignment into any number of nature-themed tasks that you see fit: "{request.text}"
 
             You must return the data strictly as a JSON list of objects.
 
@@ -108,7 +108,15 @@ async def germinate(request: AssignmentRequest):
                 model="gemini-3.1-flash-lite-preview", 
                 contents=prompt
             )
-            return {"quests": response.text}
+
+            raw_text = response.text or response.candidates[0].content.parts[0].text
+
+            cleaned_text = raw_text.replace("```json", "").replace("```", "").strip()
+
+            import json
+            quests_list = json.loads(cleaned_text)
+
+            return {"quests": quests_list}
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 

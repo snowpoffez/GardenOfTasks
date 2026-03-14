@@ -1,26 +1,55 @@
 import { useState, useRef } from 'react'
 import { Sparkle, FilePdf, X } from '@phosphor-icons/react'
 
-// Frontend-only: parse assignment description into task + subtasks (no backend)
-function parseAssignmentToTask(description, pdfFileName = '') {
-  const lines = (description || '')
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-  const title = lines[0] || 'New task'
-  const notes = pdfFileName ? `PDF: ${pdfFileName}` : ''
-  const subtaskLines = lines.slice(1).filter((line) => line.length > 0)
-  const checklistItems = subtaskLines.map((line) => {
-    const text = (line.replace(/^[\s•\-*]+\s*/, '').replace(/^\d+\.\s*/, '').trim()) || line
-    return { id: `st-${Date.now()}-${Math.random().toString(36).slice(2)}`, text }
-  })
-  return {
-    title,
-    notes,
-    rewardAmount: 3,
-    damageAmount: 3,
-    dueDate: '',
-    checklistItems,
+// Call the backend germinate API to generate tasks
+// Falls back to a fast mock response when the backend is not reachable or times out.
+// Returns { quests, usedFallback }.
+async function callGerminateAPI(text) {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 4500)
+
+  try {
+    const response = await fetch('/api/germinate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to generate tasks')
+    }
+
+    const data = await response.json()
+    return { quests: data.quests, usedFallback: false }
+  } catch (err) {
+    console.warn('Germinate API failed, using mock tasks:', err)
+    const promptSummary = text.split('\n')[0].slice(0, 60) || 'Your assignment'
+    return {
+      usedFallback: true,
+      quests: [
+        {
+          id: 1,
+          task_name: `Start: ${promptSummary}`,
+          description: `Work through the assignment: ${text}`,
+          xp: 40,
+          category: 'Research',
+          status: 'pending',
+        },
+        {
+          id: 2,
+          task_name: `Refine: ${promptSummary}`,
+          description: `Review and refine your understanding of the task.`,
+          xp: 25,
+          category: 'Drafting',
+          status: 'pending',
+        },
+      ],
+    }
+  } finally {
+    clearTimeout(timeout)
   }
 }
 
@@ -28,6 +57,7 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
   const [description, setDescription] = useState('')
   const [pdfFile, setPdfFile] = useState(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [usedFallback, setUsedFallback] = useState(false)
   const fileInputRef = useRef(null)
 
   const handleFileChange = (e) => {
@@ -44,18 +74,41 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     const text = description.trim()
     if (!text && !pdfFile) return
     setIsGenerating(true)
-    const pdfName = pdfFile?.name ?? ''
-    const combinedDescription = text + (pdfName ? `\n[Attached: ${pdfName}]` : '')
-    const taskData = parseAssignmentToTask(combinedDescription, pdfName)
-    setTimeout(() => {
-      setIsGenerating(false)
-      onGenerated(taskData)
+
+    try {
+      const pdfName = pdfFile?.name ?? ''
+      const combinedText = text + (pdfName ? `\n[Attached PDF: ${pdfName}]` : '')
+
+      // Call the germinate API
+      const { quests, usedFallback: gotFallback } = await callGerminateAPI(combinedText)
+      setUsedFallback(gotFallback)
+
+      // Convert germinate API response to the format expected by addTodo
+      const convertedTasks = quests.map(task => ({
+        title: task.task_name,
+        notes: task.description,
+        rewardAmount: Math.floor(task.xp / 10), // Convert XP to reward amount
+        damageAmount: 3, // Default damage
+        dueDate: '',
+        checklistItems: [], // Germinate doesn't provide subtasks
+      }))
+
+      // Add each generated task
+      for (const taskData of convertedTasks) {
+        onGenerated(taskData)
+      }
+
       onClose()
-    }, 400)
+    } catch (error) {
+      console.error('Error generating tasks:', error)
+      // You could add error state here if needed
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   const canGenerate = (description.trim().length > 0) || pdfFile
@@ -70,7 +123,7 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
         <div className="modal-header flex items-center justify-between">
           <span className="font-semibold flex items-center gap-2">
             <Sparkle size={20} weight="fill" style={{ color: 'var(--col-accent)' }} />
-            Generate task with AI
+            Generate Tasks with AI
           </span>
           <button type="button" onClick={onClose} className="text-sm font-medium opacity-90 hover:opacity-100">
             Cancel
@@ -78,7 +131,7 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
         </div>
         <div className="modal-body flex flex-col gap-4 flex-1 min-h-0 overflow-auto">
           <p className="text-sm opacity-90 shrink-0">
-            Describe your assignment (or paste instructions). Optionally attach a PDF. We&apos;ll create a task and subtasks from it.
+            Describe your assignment and our AI will break it down into multiple nature-themed tasks with XP rewards.
           </p>
 
           <div className="modal-field shrink-0">
@@ -125,11 +178,11 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
               style={canGenerate && !isGenerating ? { backgroundColor: 'var(--col-accent)', color: 'white' } : undefined}
             >
               {isGenerating ? (
-                <>Generating…</>
+                <>Generating Tasks…</>
               ) : (
                 <>
                   <Sparkle size={16} weight="fill" />
-                  Generate task
+                  Generate Tasks
                 </>
               )}
             </button>
