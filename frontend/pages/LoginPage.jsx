@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { login, register } from '../api/auth'
 
-// Mock: replace with API call to check if account exists (e.g. GET /auth/check?username=...)
+// Mock until backend has "check username" endpoint. Replace with API call later.
 function checkAccountExists(username) {
   const trimmed = (username || '').trim().toLowerCase()
   const existing = new Set(['test', 'user', 'demo'])
@@ -12,6 +13,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isChecking, setIsChecking] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleIdentifySubmit = (e) => {
@@ -20,7 +22,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     const value = username.trim()
     if (!value) return
     setIsChecking(true)
-    // Simulate network delay; replace with: await api.get('/auth/check', { params: { username: value } })
+    // TODO: replace with API call when backend has GET /auth/check or similar
     setTimeout(() => {
       setIsChecking(false)
       const exists = checkAccountExists(value)
@@ -29,23 +31,37 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     }, 300)
   }
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault()
     setError('')
     if (!password.trim()) return
-    // Mock login success; replace with: await api.post('/auth/login', { username, password })
-    setTimeout(() => onLoginSuccess({ username: username.trim() }), 200)
+    setIsLoading(true)
+    try {
+      const data = await login(username, password)
+      onLoginSuccess({ username: data.username ?? username.trim(), user_id: data.user_id })
+    } catch (err) {
+      setError(err.message || 'Invalid username or password')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleSignupSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault()
     setError('')
     if (!password.trim()) {
       setError('Password is required.')
       return
     }
-    // Mock signup success; replace with: await api.post('/auth/signup', { username, password })
-    setTimeout(() => onLoginSuccess({ username: username.trim() }), 200)
+    setIsLoading(true)
+    try {
+      const data = await register(username, password)
+      onLoginSuccess({ username: username.trim(), user_id: data.user_id })
+    } catch (err) {
+      setError(err.message || 'Sign up failed')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const resetToIdentify = () => {
@@ -83,7 +99,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
         {step === 'identify' && (
           <form onSubmit={handleIdentifySubmit} className="flex flex-col gap-4">
             <h1 className="text-xl font-semibold" style={{ color: 'var(--col-text-heading)' }}>
-              Log in or sign up
+              Welcome back!
             </h1>
             <p className="text-sm" style={{ color: 'var(--col-text-muted)' }}>
               Enter your username to continue.
@@ -116,13 +132,13 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
               autoComplete="current-password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setError('') }}
               className={inputClass}
               style={inputStyle}
             />
             {error && <p className="text-sm" style={{ color: 'var(--col-danger)' }}>{error}</p>}
-            <button type="submit" className="btn-accent py-2.5 rounded-lg font-medium">
-              Log in
+            <button type="submit" disabled={isLoading} className="btn-accent py-2.5 rounded-lg font-medium">
+              {isLoading ? '…' : 'Log in'}
             </button>
             <button type="button" onClick={resetToIdentify} className="text-sm font-medium" style={{ color: 'var(--col-text-muted)' }}>
               Use a different account
@@ -133,23 +149,23 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
         {step === 'signup' && (
           <form onSubmit={handleSignupSubmit} className="flex flex-col gap-4">
             <h1 className="text-xl font-semibold" style={{ color: 'var(--col-text-heading)' }}>
-              Create account
+              Sign up
             </h1>
             <p className="text-sm" style={{ color: 'var(--col-text-muted)' }}>
-              No account found for <strong>{username}</strong>. Choose a password to sign up.
+              The username &quot;<strong>{username}</strong>&quot; has not been registered yet. Choose a password to sign up:
             </p>
             <input
               type="password"
               autoComplete="new-password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setError('') }}
               className={inputClass}
               style={inputStyle}
             />
             {error && <p className="text-sm" style={{ color: 'var(--col-danger)' }}>{error}</p>}
-            <button type="submit" className="btn-accent py-2.5 rounded-lg font-medium">
-              Sign up
+            <button type="submit" disabled={isLoading} className="btn-accent py-2.5 rounded-lg font-medium">
+              {isLoading ? '…' : 'Sign up'}
             </button>
             <button type="button" onClick={resetToIdentify} className="text-sm font-medium" style={{ color: 'var(--col-text-muted)' }}>
               Use a different username
