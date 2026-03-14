@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from './components/Header'
 import HomePage from './pages/HomePage'
@@ -38,7 +38,8 @@ function getMaxXpForLevel(level) {
 
 function App() {
   const [stats, setStats] = useState(initialStats)
-  const [lastEarnedXp, setLastEarnedXp] = useState(null) // amount to show beside plant on garden
+  const [lastEarnedXp, setLastEarnedXp] = useState(null)
+  const [pendingGardenNav, setPendingGardenNav] = useState(false)
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const currentPage = pathnameToPage(pathname)
@@ -67,13 +68,31 @@ function App() {
 
   const tasks = useTasks(addGrowth, user?.user_id, addXp)
 
+  // When a harvest-ready crop appears, signal TaskPage to navigate after its animation.
+  const prevGrownSlotsRef = useRef(garden.lastGrownSlots ?? [])
   useEffect(() => {
-    if (garden.lastGrownSlots?.length > 0) navigate(PATHS.garden)
-  }, [garden.lastGrownSlots, navigate])
+    const prev = prevGrownSlotsRef.current
+    const next = garden.lastGrownSlots ?? []
+    prevGrownSlotsRef.current = next
+    if (prev.length === 0 && next.length > 0) setPendingGardenNav(true)
+  }, [garden.lastGrownSlots])
+
+  const handleNavigateToGarden = useCallback(() => {
+    setPendingGardenNav(false)
+    navigate(PATHS.garden)
+  }, [navigate])
 
   useEffect(() => {
     if (loggedIn && pathname === '/') navigate(PATHS.greenhouse, { replace: true })
   }, [loggedIn, pathname, navigate])
+
+  // When leaving the garden, clear animation state so it doesn't replay on return.
+  useEffect(() => {
+    if (pathname !== PATHS.garden && garden.lastGrownSlots?.length > 0) {
+      clearLastGrownSlots()
+      clearLastEarnedXp()
+    }
+  }, [pathname, garden.lastGrownSlots?.length, clearLastGrownSlots, clearLastEarnedXp])
 
   const activeTodoCount = tasks.todos.filter((t) => !t.completed).length
   const incompleteDailyCount = tasks.dailies.filter((d) => !d.checked).length
@@ -152,6 +171,10 @@ function App() {
           onEditDaily={tasks.editDaily}
           onDeleteTodo={tasks.deleteTodo}
           onDeleteDaily={tasks.deleteDaily}
+          lastEarnedXp={lastEarnedXp}
+          onClearLastEarnedXp={clearLastEarnedXp}
+          pendingGardenNav={pendingGardenNav}
+          onNavigateToGarden={handleNavigateToGarden}
         />
       )}
 

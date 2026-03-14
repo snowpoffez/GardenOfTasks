@@ -1,4 +1,5 @@
 import { UserCircle, Leaf, CurrencyDollar, Star } from '@phosphor-icons/react'
+import { formatCoins } from '../constants/garden'
 
 export default function ProfilePage({ user, stats }) {
   const username = user?.username ?? 'Gardener'
@@ -113,7 +114,7 @@ export default function ProfilePage({ user, stats }) {
                   Coins
                 </p>
                 <p className="text-lg font-bold" style={{ color: 'var(--col-text-heading)' }}>
-                  {gold}
+                  {formatCoins(gold, 3)}
                 </p>
               </div>
             </div>

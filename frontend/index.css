@@ -520,11 +520,19 @@ button, [role="button"], select, .modal-overlay {
   border-radius: 0.75rem;
   border: 1px solid var(--col-border);
   background-color: var(--col-bg-card);
-  padding: 1.25rem 1.25rem;
+  padding: 0.875rem 1rem;
   animation: garden-shop-box-in 0.25s ease-out;
+  max-height: min(18rem, 45vh);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.garden-shop-box > p:first-of-type {
+  margin-bottom: 0.5rem;
 }
 .garden-shop-seed-list {
-  max-height: min(20rem, 50vh);
+  max-height: min(10rem, 26vh);
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 0.25rem;
@@ -585,15 +593,7 @@ button, [role="button"], select, .modal-overlay {
   width: auto;
 }
 .garden-shop-sidebar-open .garden-shop-box {
-  position: absolute;
-  right: 100%;
-  top: 0;
-  margin-right: 0.5rem;
-  width: 24rem;
-  max-width: min(24rem, calc(100vw - 12rem));
-  z-index: 30;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 .garden-shop-toggle {
   display: flex;
@@ -611,7 +611,7 @@ button, [role="button"], select, .modal-overlay {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .garden-shop-sidebar-open .garden-shop-toggle {
-  width: auto;
+  width: 100%;
 }
 .garden-shop-toggle:hover {
   background-color: var(--col-bg-hover, rgba(0, 0, 0, 0.04));
@@ -628,6 +628,14 @@ button, [role="button"], select, .modal-overlay {
   white-space: nowrap;
 }
 
+.garden-right-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 24rem;
+  min-width: 24rem;
+  overflow-y: auto;
+}
 .garden-upgrades-sidebar {
   display: flex;
   flex-direction: column;
@@ -639,14 +647,7 @@ button, [role="button"], select, .modal-overlay {
   width: auto;
 }
 .garden-upgrades-sidebar-open .garden-upgrades-box {
-  position: absolute;
-  left: 100%;
-  top: 0;
-  margin-left: 0.5rem;
-  width: 14rem;
-  z-index: 30;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 .garden-upgrades-toggle {
   display: flex;
@@ -664,7 +665,7 @@ button, [role="button"], select, .modal-overlay {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .garden-upgrades-sidebar-open .garden-upgrades-toggle {
-  width: auto;
+  width: 100%;
 }
 .garden-upgrades-toggle:hover {
   background-color: var(--col-bg-hover, rgba(0, 0, 0, 0.04));
@@ -763,17 +764,21 @@ button, [role="button"], select, .modal-overlay {
   justify-content: center;
 }
 
-/* XP float beside plant: drifts up and slightly sideways, fades */
+/* XP float: drifts upward and fades. Used on task cards (portal) and garden slots. */
 @keyframes xp-float {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) translateY(0) translateX(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) translateY(-2.5rem) translateX(-0.6rem);
-  }
+  0%   { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-2.5rem); }
 }
+
+/* Portal version: fixed to viewport, centered on the measured card position */
+.xp-float-portal {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  animation: xp-float 1.2s ease-out forwards;
+}
+
+/* Garden slot version: absolute, to the right of the slot */
 .xp-float {
   position: absolute;
   left: 100%;
@@ -783,6 +788,7 @@ button, [role="button"], select, .modal-overlay {
   pointer-events: none;
   animation: xp-float 1.2s ease-out forwards;
 }
+
 .xp-float-inner {
   display: inline-block;
   padding: 0.25rem 0.5rem 0.25rem 0.4rem;

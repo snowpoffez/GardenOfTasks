@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds, initialTodos } from '../constants/tasks'
+import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds } from '../constants/tasks'
 import { useHistory } from './useHistory'
 
 export function useTasks(addGrowth, userId, onEarnXp) {
@@ -11,9 +11,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
   const [editingTodoId, setEditingTodoId] = useState(null)
   const [editingDailyId, setEditingDailyId] = useState(null)
 
-  const { history, push: pushHistory, undo: undoHistory, canUndo } = useHistory()
+  const { push: pushHistory, undo: undoHistory, canUndo } = useHistory()
 
-  const push = useCallback(() => pushHistory(dailies, todos, dailyOrderIds), [pushHistory, dailies, todos, dailyOrderIds])
+  const push = useCallback((meta) => pushHistory(dailies, todos, dailyOrderIds, meta), [pushHistory, dailies, todos, dailyOrderIds])
 
   // Load tasks from backend on userId change (e.g. login/logout)
   useEffect(() => {
@@ -64,7 +64,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       onEarnXp?.(daily.rewardAmount ?? daily.damageAmount ?? 5)
       addGrowth(1)
     }
-    push()
+    push({ lastToggledId: dailyId, lastToggledType: 'daily' })
 
     const newChecked = !daily.checked
     setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
@@ -146,7 +146,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       onEarnXp?.(todo.rewardAmount ?? todo.damageAmount ?? 5)
       addGrowth(2)
     }
-    push()
+    push({ lastToggledId: todoId, lastToggledType: 'todo' })
 
     const newCompleted = !todo.completed
     setTodos((prev) => prev.map((t) => t.id === todoId ? { ...t, completed: newCompleted } : t))
@@ -229,15 +229,34 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     })
   }, [push])
 
-  // --- Undo ---
+  // --- Undo (task-only: restores task state, does not affect garden; syncs backend to incomplete) ---
 
   const undo = useCallback(() => {
-    undoHistory((snapshot) => {
+    undoHistory((snapshot, entry) => {
       setDailies(snapshot.dailies)
       setTodos(snapshot.todos)
       if (snapshot.dailyOrderIds) setDailyOrderIds(snapshot.dailyOrderIds)
+      if (entry?.lastToggledId && entry?.lastToggledType && userId) {
+        const id = String(entry.lastToggledId)
+        const dbId = id.replace(/^(daily|todo)-/, '')
+        if (dbId && !Number.isNaN(Number(dbId))) {
+          if (entry.lastToggledType === 'daily') {
+            fetch(`/api/dailies/${dbId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ checked: false }),
+            }).catch((err) => console.error('Failed to undo daily:', err))
+          } else if (entry.lastToggledType === 'todo') {
+            fetch(`/api/tasks/${dbId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'todo' }),
+            }).catch((err) => console.error('Failed to undo todo:', err))
+          }
+        }
+      }
     })
-  }, [undoHistory])
+  }, [undoHistory, userId])
 
   // --- Modal helpers ---
 
