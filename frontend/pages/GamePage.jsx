@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { CaretLeft, CaretRight, CurrencyDollar, Package, TrendUp } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, Package, TrendUp } from '@phosphor-icons/react'
+import { formatCoins } from '../constants/garden'
 
 const QUEUE_GLOW_COUNT = 3
 
@@ -16,6 +17,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   const [pendingSlotIndex, setPendingSlotIndex] = useState(null)
   const [popupMessage, setPopupMessage] = useState(null)
   const [upgradesOpen, setUpgradesOpen] = useState(false)
+  const [shopOpen, setShopOpen] = useState(false)
 
   const getSeed = (seedId) => seedsCatalog.find((s) => s.id === seedId)
   const emptySlotsCount = slots.filter((s) => !s).length
@@ -123,7 +125,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
                       </div>
                       {!atMax && cost != null && (
                         <span className="text-sm tabular-nums shrink-0" style={{ color: 'var(--col-text-muted)' }}>
-                          {cost}
+                          {formatCoins(cost)}
                         </span>
                       )}
                     </div>
@@ -193,56 +195,58 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
         </div>
       </main>
 
-      <aside className={`garden-shop flex-shrink-0 w-full sm:w-72 order-2 flex flex-col ${showDeselectOverlay ? 'garden-shop-raised' : ''}`}>
-        <div className="garden-coins flex items-center gap-3 mb-8">
-          <CurrencyDollar size={40} weight="bold" className="shrink-0" style={{ color: 'var(--col-accent)' }} />
-          <span className="text-5xl font-bold leading-none tabular-nums" style={{ color: 'var(--col-text-heading)' }}>
-            {coins}
-          </span>
-          <span className="text-3xl font-medium" style={{ color: 'var(--col-text-muted)' }}>coins</span>
-        </div>
-        <div className="garden-shop-box">
-          <h2 className="text-3xl font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--col-text-heading)' }}>
-            <Package size={28} />
-            Shop
-          </h2>
-          <p className="text-sm mb-3" style={{ color: 'var(--col-text-muted)' }}>
-            Pick a seed, then tap an empty plot to plant. Complete tasks in The Greenhouse to grow.
-          </p>
-          <div className="flex flex-col gap-2">
-            {seedsCatalog.map((seed) => {
-              const canAfford = coins >= seed.cost
-              const isSelected = selectedSeedId === seed.id
-              const grayed = !canAfford || emptySlotsCount === 0
-              return (
-                <button
-                  key={seed.id}
-                  type="button"
-                  className={`garden-shop-card text-left flex items-center justify-between ${grayed ? 'btn-disabled' : ''}`}
-                  disabled={false}
-                  onClick={() => handleSelectSeed(seed.id, canAfford, isSelected)}
-                >
-                  <span className="text-base font-medium" style={{ color: 'var(--col-text-body)' }}>
-                    {seed.name} <span className="text-sm opacity-80">({seed.id})</span>
-                  </span>
-                  <span className="text-base tabular-nums" style={{ color: 'var(--col-text-muted)' }}>
-                    {seed.cost} · {seed.stages} stages
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        {selectedSeedId && (
-          <p className="text-sm mt-3" style={{ color: 'var(--col-accent)' }}>
-            Click an empty plot to plant, or click elsewhere to cancel.
-          </p>
-        )}
-          {waitingForSeed && (
-            <p className="text-sm mt-3" style={{ color: 'var(--col-accent)' }}>
-              Pick a seed to plant there, or click elsewhere to cancel.
+      <aside className={`garden-shop-sidebar flex-shrink-0 order-2 flex flex-col ${shopOpen ? 'garden-shop-sidebar-open' : 'garden-shop-sidebar-collapsed'} ${showDeselectOverlay ? 'garden-shop-raised' : ''}`}>
+        <button
+          type="button"
+          className="garden-shop-toggle"
+          onClick={() => setShopOpen((o) => !o)}
+          aria-expanded={shopOpen}
+          aria-label={shopOpen ? 'Collapse shop' : 'Expand shop'}
+        >
+          <Package size={24} weight="bold" />
+          <span className="garden-shop-toggle-label">Shop</span>
+          {shopOpen ? <CaretRight size={20} /> : <CaretLeft size={20} />}
+        </button>
+        {shopOpen && (
+          <div className="garden-shop-box">
+            <p className="text-sm mb-3" style={{ color: 'var(--col-text-muted)' }}>
+              Pick a seed, then tap an empty plot to plant. Complete tasks in The Greenhouse to grow.
             </p>
-          )}
-        </div>
+            <div className="garden-shop-seed-list flex flex-col gap-2">
+              {[...seedsCatalog].sort((a, b) => a.cost - b.cost).map((seed) => {
+                const canAfford = coins >= seed.cost
+                const isSelected = selectedSeedId === seed.id
+                const grayed = !canAfford || emptySlotsCount === 0
+                return (
+                  <button
+                    key={seed.id}
+                    type="button"
+                    className={`garden-shop-card text-left flex items-center justify-between ${grayed ? 'btn-disabled' : ''}`}
+                    disabled={false}
+                    onClick={() => handleSelectSeed(seed.id, canAfford, isSelected)}
+                  >
+                    <span className="text-base font-medium" style={{ color: 'var(--col-text-body)' }}>
+                      {seed.name} <span className="text-sm opacity-80">({seed.id})</span>
+                    </span>
+                    <span className="text-base tabular-nums" style={{ color: 'var(--col-text-muted)' }}>
+                      {formatCoins(seed.cost)} · {seed.stages} stages
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+            {selectedSeedId && (
+              <p className="text-sm mt-3" style={{ color: 'var(--col-accent)' }}>
+                Click an empty plot to plant, or click elsewhere to cancel.
+              </p>
+            )}
+            {waitingForSeed && (
+              <p className="text-sm mt-3" style={{ color: 'var(--col-accent)' }}>
+                Pick a seed to plant there, or click elsewhere to cancel.
+              </p>
+            )}
+          </div>
+        )}
       </aside>
 
       {popupMessage && (

@@ -39,7 +39,7 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
 
   return (
     <header className="flex flex-col">
-      <div className="navbar flex items-center justify-between px-6 py-4">
+      <div className="navbar flex items-center justify-between px-6 py-6">
         <div className="flex items-center gap-8">
           <span className="navbar-brand whitespace-nowrap">&gt; Garden of Tasks</span>
           <nav className="navbar-nav">
