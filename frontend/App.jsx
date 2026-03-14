@@ -99,7 +99,7 @@ function App() {
         {authView === 'home' && (
           <HomePage
             onGoToLogin={() => setAuthView('login')}
-            onDevEnter={() => { setUser({ username: 'Gardener' }); setLoggedIn(true); navigate(PATHS.greenhouse) }}
+            onDevEnter={() => { setUser({ username: 'Gardener', user_id: 1}); setLoggedIn(true); navigate(PATHS.greenhouse) }}
           />
         )}
         {authView === 'login' && (
