@@ -107,8 +107,8 @@ def create_user(username: str, password: str):
 
                 # 2. Insert the new user
                 cur.execute(
-                    "INSERT INTO users (username, password) VALUES (%s, %s) RETURNING id",
-                    (username, password)
+                    "INSERT INTO users (username, password, currency) VALUES (%s, %s, %s) RETURNING id",
+                    (username, password, 100)
                 )
 
                 # Get the new ID
