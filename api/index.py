@@ -5,7 +5,7 @@ from google import genai
 import psycopg
 import os
 from dotenv import load_dotenv
-from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks
+from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks, create_daily, delete_daily, get_user_dailies
 
 # Debug mode for saving API resources during development
 DEBUG_MODE = False # False in production to ensure full functionality
@@ -204,3 +204,26 @@ def check_username_exists(username: str):
     except Exception as e:
         print(f"Database error: {e}")
         raise
+
+@app.post("/api/dailies/createdaily")
+def create_daily_route(task: TaskCreate): # Reusing TaskCreate schema since fields match
+    try:
+        return create_daily(task.user_id, task.task_name, task.description, task.xp, task.status)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Could not create daily")
+
+@app.delete("/api/dailies/{daily_id}")
+def delete_daily_route(daily_id: int):
+    try:
+        return delete_daily(daily_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Could not delete daily")
+
+@app.get("/api/dailies/{user_id}")
+def get_user_dailies_route(user_id: int):
+    try:
+        return get_user_dailies(user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")

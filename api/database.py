@@ -179,3 +179,56 @@ def get_user_tasks(user_id: int):
     except Exception as e:
         print(f"Database error: {e}")
         raise
+
+def create_daily(user_id: int, task_name: str, description: str = "No description provided", xp: int = 10, status: str = "todo"):
+    """
+    Creates a new daily.
+    Returns dict with success, daily_id or raises exception
+    """
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO dailies (user_id, task_name, description, xp, status)
+                    VALUES (%s, %s, %s, %s, %s)
+                    RETURNING id
+                    """,
+                    (user_id, task_name, description, xp, status)
+                )
+                new_daily_id = cur.fetchone()[0]
+                return {"success": True, "daily_id": new_daily_id}
+    except Exception as e:
+        print(f"Error creating daily: {e}")
+        raise
+
+def delete_daily(daily_id: int):
+    """
+    Deletes a daily by ID.
+    """
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM dailies WHERE id = %s", (daily_id,))
+                if cur.rowcount == 0:
+                    raise ValueError("Daily not found")
+                return {"success": True, "message": f"Daily {daily_id} deleted"}
+    except Exception as e:
+        print(f"Delete Error: {e}")
+        raise
+
+def get_user_dailies(user_id: int):
+    """
+    Gets all dailies for a user.
+    """
+    try:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT id, task_name, description, xp, status FROM dailies WHERE user_id = %s",
+                    (user_id,)
+                )
+                return cur.fetchall()
+    except Exception as e:
+        print(f"Database error: {e}")
+        raise
