@@ -5,7 +5,7 @@ from google import genai
 import psycopg
 import os
 from dotenv import load_dotenv
-from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks, create_daily, delete_daily, get_user_dailies, update_daily_partial, update_task_partial
+from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks, create_daily, delete_daily, get_user_dailies, update_daily_partial, update_task_partial, add_user_currency, add_user_xp, level_up_user
 
 # Debug mode for saving API resources during development
 DEBUG_MODE = False # False in production to ensure full functionality
@@ -259,6 +259,40 @@ def patch_task_route(task_id: int, payload: TaskUpdate):
     
     try:
         return update_task_partial(task_id, updates)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+        class CurrencyRequest(BaseModel):
+    amount: int
+
+@app.post("/api/users/{user_id}/add-currency")
+def add_currency_route(user_id: int, payload: CurrencyRequest):
+    try:
+        # payload.amount can be negative if you want to 'spend' money too
+        return add_user_currency(user_id, payload.amount)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.post("/api/users/{user_id}/level-up")
+def level_up_route(user_id: int):
+    try:
+        return level_up_user(user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to level up user")
+
+@app.patch("/api/users/{user_id}/add-xp")
+def add_xp_route(user_id: int, payload: XPIncrement):
+    """
+    Increments user XP. 
+    Use this when a task or daily is marked as 'completed'.
+    """
+    try:
+        return add_user_xp(user_id, payload.xp_gain)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
