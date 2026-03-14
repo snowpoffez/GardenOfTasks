@@ -18,7 +18,7 @@ def init_db():
                     CREATE TABLE IF NOT EXISTS users (
                         id SERIAL PRIMARY KEY,
                         username TEXT UNIQUE NOT NULL,
-                        password TEXT NOT NULL.
+                        password TEXT NOT NULL,
                         currency INTEGER DEFAULT 0,
                         xp INTEGER DEFAULT 0,
                         level INTEGER DEFAULT 1
