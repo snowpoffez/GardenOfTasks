@@ -22,7 +22,7 @@ export function useTasks(addGrowth, userId) {
       .then((res) => res.json())
       .then((tasks) => {
         setTodos(tasks.map(t => ({
-          id: 'todo-${t.id}',
+          id: t.id,
           title: t.task_name,
           notes: t.description,
           completed: t.status == 'completed',
