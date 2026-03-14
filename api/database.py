@@ -1,6 +1,10 @@
 import os
 import psycopg
 from psycopg.rows import dict_row
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 DATABASE_URL = os.environ.get("POSTGRES_URL") or os.environ.get("DATABASE_URL")
 
