@@ -18,7 +18,10 @@ def init_db():
                     CREATE TABLE IF NOT EXISTS users (
                         id SERIAL PRIMARY KEY,
                         username TEXT UNIQUE NOT NULL,
-                        password TEXT NOT NULL
+                        password TEXT NOT NULL.
+                        currency INTEGER DEFAULT 0,
+                        xp INTEGER DEFAULT 0,
+                        level INTEGER DEFAULT 1
                     );
                 """)
 
@@ -319,4 +322,86 @@ def update_task_partial(task_id: int, updates: dict):
                 return {"success": True, "message": "Task updated successfully"}
     except Exception as e:
         print(f"Update Error: {e}")
+        raise
+
+def add_user_currency(user_id: int, amount: int):
+    """
+    Increments a user's currency by a specific amount.
+    Returns the new balance.
+    """
+    try:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE users 
+                    SET currency = currency + %s 
+                    WHERE id = %s 
+                    RETURNING currency
+                    """,
+                    (amount, user_id)
+                )
+                
+                result = cur.fetchone()
+                if not result:
+                    raise ValueError("User not found")
+                
+                return {"success": True, "new_balance": result["currency"]}
+    except Exception as e:
+        print(f"Currency Update Error: {e}")
+        raise
+
+def add_user_xp(user_id: int, xp_gain: int):
+    """
+    Increments a user's total XP by a specific amount.
+    """
+    try:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE users 
+                    SET xp = xp + %s 
+                    WHERE id = %s 
+                    RETURNING xp
+                    """,
+                    (xp_gain, user_id)
+                )
+                result = cur.fetchone()
+                if not result:
+                    raise ValueError("User not found")
+                
+                return {"success": True, "new_xp": result["xp"]}
+    except Exception as e:
+        print(f"XP Update Error: {e}")
+        raise
+
+def level_up_user(user_id: int):
+    """
+    Resets total_xp to 0 and increments the level by 1.
+    """
+    try:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE users 
+                    SET xp = 0, 
+                        level = level + 1 
+                    WHERE id = %s 
+                    RETURNING level
+                    """,
+                    (user_id,)
+                )
+                result = cur.fetchone()
+                if not result:
+                    raise ValueError("User not found")
+                
+                return {
+                    "success": True, 
+                    "new_level": result["level"],
+                    "message": f"Congratulations! You reached Level {result['level']}!"
+                }
+    except Exception as e:
+        print(f"Level Up Error: {e}")
         raise

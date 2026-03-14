@@ -3,8 +3,8 @@ import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds } from '../co
 import { useHistory } from './useHistory'
 
 export function useTasks(addGrowth, userId, onEarnXp) {
-  const [dailies, setDailies] = useState(initialDailies)
-  const [dailyOrderIds, setDailyOrderIds] = useState(initialDailyOrderIds)
+  const [dailies, setDailies] = useState([])
+  const [dailyOrderIds, setDailyOrderIds] = useState([])
   const [todos, setTodos] = useState([])
   const [todoTab, setTodoTab] = useState('active')
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
@@ -66,38 +66,73 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     }
     push({ lastToggledId: dailyId, lastToggledType: 'daily' })
 
-    const newChecked = !daily.checked
+    const newChecked = daily ? !daily.checked : false
     setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
 
     const dbId = dailyId.toString().replace('daily-', '')
     if (userId && !isNaN(dbId)) {
-        fetch(`/api/dailies/${dbId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ checked: newChecked })
-        }).catch(err => console.error('Failed to update daily:', err))
+      fetch(`/api/dailies/${dbId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ checked: newChecked }),
+      }).catch((err) => console.error('Failed to update daily:', err))
     }
-  }, [push, dailies, addGrowth, userId])
+  }, [push, dailies, addGrowth, onEarnXp, userId])
 
-  const addDaily = useCallback((data) => {
+  const addDaily = useCallback(async (data) => {
     push()
-    const newId = `daily-${Date.now()}`
     const accentColor = DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)]
-    setDailies((prev) => [...prev, {
-      id: newId,
-      title: data.title || '',
-      checked: false,
-      accentColor,
-      count: 0,
-      notes: data.notes || '',
-      dueDate: data.dueDate || '',
-      repeatInterval: data.repeatInterval || 'Daily',
-      repeatEvery: data.repeatEvery ?? 1,
-      repeatUnit: data.repeatUnit || 'day',
-    }])
-    setDailyOrderIds((prev) => [...prev, newId])
+
+    if (userId) {
+      try {
+        const res = await fetch('/api/dailies/createdaily', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            task_name: data.title || 'New daily',
+            description: data.notes || '',
+            xp: 10,
+            status: 'todo'
+          })
+        })
+        const saved = await res.json()
+        const newId = `daily-${saved.daily_id}` // ← real DB id
+
+        setDailies((prev) => [...prev, {
+          id: newId,
+          title: data.title || '',
+          checked: false,
+          accentColor,
+          count: 0,
+          notes: data.notes || '',
+          dueDate: data.dueDate || '',
+          repeatInterval: data.repeatInterval || 'Daily',
+          repeatEvery: data.repeatEvery ?? 1,
+          repeatUnit: data.repeatUnit || 'day',
+        }])
+        setDailyOrderIds((prev) => [...prev, newId])
+      } catch (err) {
+        console.error('Failed to save daily:', err)
+      }
+    } else {
+      const newId = `daily-${Date.now()}`
+      setDailies((prev) => [...prev, {
+        id: newId,
+        title: data.title || '',
+        checked: false,
+        accentColor,
+        count: 0,
+        notes: data.notes || '',
+        dueDate: data.dueDate || '',
+        repeatInterval: data.repeatInterval || 'Daily',
+        repeatEvery: data.repeatEvery ?? 1,
+        repeatUnit: data.repeatUnit || 'day',
+      }])
+      setDailyOrderIds((prev) => [...prev, newId])
+    }
     setAddTaskModal(null)
-  }, [push])
+  }, [push, userId])
 
   const editDaily = useCallback((data) => {
     if (!editingDailyId) return
@@ -166,10 +201,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     push()
     const accentColor = DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)]
 
-    // Save to database
     if (userId) {
       try {
-        await fetch('/api/tasks/createtask', {
+        const res = await fetch('/api/tasks/createtask', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -180,24 +214,38 @@ export function useTasks(addGrowth, userId, onEarnXp) {
             status: 'todo'
           })
         })
+        const saved = await res.json()
+        // Use the real DB id
+        setTodos((prev) => [...prev, {
+          id: saved.task_id,  // ← real DB id
+          title: data.title || 'New task',
+          completed: false,
+          accentColor,
+          notes: data.notes || '',
+          rewardAmount: data.rewardAmount ?? 3,
+          damageAmount: data.damageAmount ?? 3,
+          dueDate: data.dueDate || '',
+          checklistItems: data.checklistItems || [],
+        }])
       } catch (err) {
         console.error('Failed to save task:', err)
       }
+    } else {
+      // Not logged in, just use local id
+      setTodos((prev) => [...prev, {
+        id: crypto.randomUUID(),
+        title: data.title || 'New task',
+        completed: false,
+        accentColor,
+        notes: data.notes || '',
+        rewardAmount: data.rewardAmount ?? 3,
+        damageAmount: data.damageAmount ?? 3,
+        dueDate: data.dueDate || '',
+        checklistItems: data.checklistItems || [],
+      }])
     }
-
-    setTodos((prev) => [...prev, {
-      id: crypto.randomUUID(),
-      title: data.title || 'New task',
-      completed: false,
-      accentColor,
-      notes: data.notes || '',
-      rewardAmount: data.rewardAmount ?? 3,
-      damageAmount: data.damageAmount ?? 3,
-      dueDate: data.dueDate || '',
-      checklistItems: data.checklistItems || [],
-    }])
     setAddTaskModal(null)
-  }, [push])
+  }, [push, userId])
 
   const editTodo = useCallback((data) => {
     if (!editingTodoId) return
