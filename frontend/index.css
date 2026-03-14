@@ -67,6 +67,9 @@
   --col-modal-header: var(--col-green-800);
   --col-rating: var(--col-green-600);
   --col-danger: var(--col-gray-600);
+  --col-warn-bg: #fef2f2;
+  --col-warn-border: #fecaca;
+  --col-warn-text: #b91c1c;
 }
 
 * {
@@ -82,11 +85,21 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Interactive elements: show pointer (hand) cursor on hover */
 button, [role="button"], select, .modal-overlay {
   cursor: pointer;
+}
+
+/* Home / landing hero. To use a nature wallpaper: put the image in frontend/public/
+   (e.g. public/hero.jpg) and add: background-image: url('/hero.jpg');
+   background-size: cover; background-position: center; */
+.home-hero {
+  background: linear-gradient(160deg, var(--col-green-50) 0%, var(--col-green-100) 40%, var(--col-green-200) 100%);
+  background-color: var(--col-bg-page);
 }
 
 /* Strip colors for daily cards (use variable-based class names) */
@@ -266,4 +279,185 @@ button, [role="button"], select, .modal-overlay {
 }
 .star-rating button.filled {
   color: var(--col-rating);
+}
+
+/* Garden (The Garden) */
+.garden-grid {
+  display: grid;
+  gap: 0.75rem;
+  justify-content: center;
+  align-content: center;
+}
+.garden-slot {
+  width: 5rem;
+  height: 5rem;
+  min-width: 5rem;
+  min-height: 5rem;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--col-border);
+  background-color: var(--col-bg-card);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+.garden-slot:hover {
+  transform: scale(1.2);
+}
+.garden-slot-queue-1 {
+  box-shadow: 0 0 0 4px var(--col-green-600), 0 0 24px var(--col-green-600), 0 0 40px rgba(5, 150, 105, 0.5);
+}
+.garden-slot-queue-2 {
+  box-shadow: 0 0 0 3px var(--col-green-500), 0 0 18px var(--col-green-500), 0 0 28px rgba(16, 185, 129, 0.35);
+}
+.garden-slot-queue-3 {
+  box-shadow: 0 0 0 2px var(--col-green-400), 0 0 12px var(--col-green-400), 0 0 20px rgba(52, 211, 153, 0.25);
+}
+.garden-slot-harvest {
+  box-shadow: 0 0 0 3px var(--col-green-600), 0 0 20px rgba(245, 158, 11, 0.6);
+}
+.garden-coins {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.garden-shop-box {
+  border-radius: 0.75rem;
+  border: 1px solid var(--col-border);
+  background-color: var(--col-bg-card);
+  padding: 1.25rem 1.25rem;
+}
+.garden-shop-card {
+  border-radius: 0.5rem;
+  border: 1px solid var(--col-border);
+  background-color: var(--col-bg-card);
+  padding: 0.75rem 1rem;
+}
+.garden-shop-card:disabled,
+.garden-shop-card.btn-disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.garden-upgrades-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: width 0.2s ease;
+}
+.garden-upgrades-sidebar-collapsed {
+  width: auto;
+}
+.garden-upgrades-sidebar-open {
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .garden-upgrades-sidebar-open {
+    width: 14rem;
+  }
+}
+.garden-upgrades-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--col-border);
+  background-color: var(--col-bg-card);
+  color: var(--col-text-heading);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.garden-upgrades-sidebar-open .garden-upgrades-toggle {
+  width: 100%;
+}
+.garden-upgrades-toggle:hover {
+  background-color: var(--col-bg-hover, rgba(0, 0, 0, 0.04));
+}
+.garden-upgrades-toggle svg:first-of-type {
+  color: var(--col-accent);
+  flex-shrink: 0;
+}
+.garden-upgrades-toggle-label {
+  flex: 1;
+  text-align: left;
+}
+.garden-upgrades-sidebar-collapsed .garden-upgrades-toggle-label {
+  white-space: nowrap;
+}
+.garden-upgrades-box {
+  border-radius: 0.75rem;
+  border: 1px solid var(--col-border);
+  background-color: var(--col-bg-card);
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.garden-upgrades-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--col-text-heading);
+}
+.garden-upgrades-title svg {
+  color: var(--col-accent);
+}
+.garden-upgrade-card {
+  border-radius: 0.5rem;
+  border: 1px solid var(--col-border-light);
+  padding: 0.75rem;
+  background-color: var(--col-bg-page);
+}
+.garden-upgrade-btn {
+  margin-top: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  background-color: var(--col-accent);
+  color: var(--col-accent-foreground);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.garden-upgrade-btn:hover:not(:disabled) {
+  background-color: var(--col-accent-hover);
+}
+.garden-upgrade-btn.btn-disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.garden-grid-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.garden-full-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 40;
+  cursor: pointer;
+}
+.garden-shop-raised {
+  position: relative;
+  z-index: 50;
+}
+.garden-slot-raised {
+  position: relative;
+  z-index: 50;
+}
+.garden-popup-warn .modal-panel {
+  background-color: var(--col-warn-bg);
+  border: 1px solid var(--col-warn-border);
+}
+.garden-popup-warn .modal-header {
+  background-color: var(--col-warn-text);
+  color: white;
 }
