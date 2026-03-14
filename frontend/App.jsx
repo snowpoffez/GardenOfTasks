@@ -30,7 +30,7 @@ const initialStats = {
   level: 1,
   xp: 0,
   maxXp: 100,
-  gold: 42.3,
+  gold: 100,
 }
 
 function getMaxXpForLevel(level) {
@@ -38,7 +38,7 @@ function getMaxXpForLevel(level) {
 }
 
 function App() {
-  const [stats, setStats] = useState()
+  const [stats, setStats] = useState(initialStats)
   const [lastEarnedXp, setLastEarnedXp] = useState(null)
   const [pendingGardenNav, setPendingGardenNav] = useState(false)
   const { pathname } = useLocation()
@@ -53,7 +53,10 @@ function App() {
   // Load level and XP from DB when user logs in
   useEffect(() => {
     const uid = user?.user_id
-    if (!uid) return
+    if (!uid) {
+      setStats(initialStats)
+      return
+    } 
     Promise.all([
       fetch(`/api/users/${uid}/level`).then((r) => r.json()),
       fetch(`/api/users/${uid}/xp`).then((r) => r.json()),
@@ -141,20 +144,6 @@ function App() {
     setUser(userData ?? { username: 'Gardener' })
     setLoggedIn(true)
     navigate(PATHS.greenhouse)
-
-    useEffect(() => {
-      if (!user?.user_id) return
-      fetch(`/api/users/${user.user_id}/stats`)
-          .then(res => res.json())
-          .then(data => {
-              setStats({
-                  level: data.level,
-                  xp: data.xp,
-                  maxXp: getMaxXpForLevel(data.level),
-                  gold: data.currency,
-          })
-      })
-    }, [])
   }, [navigate])
 
   const handleLogout = useCallback(() => {
