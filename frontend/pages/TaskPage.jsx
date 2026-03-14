@@ -63,21 +63,40 @@ function useFlipList(ids) {
     if (!snap) return
     snapRef.current = null
 
+    const durationMs = typeof DAILY_SLIDE_MS === 'number' ? DAILY_SLIDE_MS : 750
+    const toAnimate = []
+
     for (const [id, el] of Object.entries(nodeRefs.current)) {
       if (!(id in snap)) continue
       const newTop = el.getBoundingClientRect().top
       const delta = snap[id] - newTop
       if (delta === 0) continue
-      // Snap to old position instantly, then animate to new position
+      el.style.animation = 'none'
       el.style.transition = 'none'
       el.style.transform = `translateY(${delta}px)`
-      // Force reflow so the browser registers the starting position
-      el.getBoundingClientRect()
-      el.style.transition = `transform ${DAILY_SLIDE_MS}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
-      el.style.transform = 'translateY(0)'
-      const onEnd = () => { el.style.transition = ''; el.style.transform = '' }
-      el.addEventListener('transitionend', onEnd, { once: true })
+      el.style.willChange = 'transform'
+      toAnimate.push({ el, delta })
     }
+
+    const elementToScroll = toAnimate.length ? toAnimate.reduce((best, cur) => Math.abs(cur.delta) > Math.abs(best.delta) ? cur : best, toAnimate[0]).el : null
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        for (const { el } of toAnimate) {
+          el.style.transition = `transform ${durationMs}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`
+          el.style.transform = 'translateY(0)'
+          const onEnd = () => {
+            el.style.transition = ''
+            el.style.transform = ''
+            el.style.willChange = ''
+          }
+          el.addEventListener('transitionend', onEnd, { once: true })
+        }
+        if (elementToScroll) {
+          elementToScroll.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+        }
+      })
+    })
   }, [ids]) // re-run whenever the id order changes
 
   return [setNodeRef, snapshotPositions]
