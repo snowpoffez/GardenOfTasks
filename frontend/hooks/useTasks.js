@@ -25,7 +25,7 @@ export function useTasks(addGrowth, userId) {
           id: t.id,
           title: t.task_name,
           notes: t.description,
-          completed: t.status == 'completed',
+          completed: t.status === 'completed',
           rewardAmount: t.xp,
           dueDate: '', // Backend doesn't support due dates yet
           checklistItems: [], // Backend doesn't support subtasks yet
