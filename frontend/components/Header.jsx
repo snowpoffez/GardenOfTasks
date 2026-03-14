@@ -7,7 +7,7 @@ export default function Header({ stats }) {
     <header className="flex flex-col">
       <div className="navbar flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-8">
-          <span className="navbar-brand whitespace-nowrap">&gt; Habitius</span>
+          <span className="navbar-brand whitespace-nowrap">&gt; Garden of Tasks</span>
           <nav className="navbar-nav">
             <span className="navbar-link navbar-link-active">The Greenhouse</span>
             <span className="navbar-link">The Garden</span>
