@@ -37,7 +37,7 @@ function getMaxXpForLevel(level) {
 }
 
 function App() {
-  const [stats, setStats] = useState(initialStats)
+  const [stats, setStats] = useState()
   const [lastEarnedXp, setLastEarnedXp] = useState(null)
   const [pendingGardenNav, setPendingGardenNav] = useState(false)
   const { pathname } = useLocation()
@@ -101,6 +101,20 @@ function App() {
     setUser(userData ?? { username: 'Gardener' })
     setLoggedIn(true)
     navigate(PATHS.greenhouse)
+
+    useEffect(() => {
+      if (!user?.user_id) return
+      fetch(`/api/users/${user.user_id}/stats`)
+          .then(res => res.json())
+          .then(data => {
+              setStats({
+                  level: data.level,
+                  xp: data.xp,
+                  maxXp: getMaxXpForLevel(data.level),
+                  gold: data.currency,
+          })
+      })
+    }, [])
   }, [navigate])
 
   const handleLogout = useCallback(() => {

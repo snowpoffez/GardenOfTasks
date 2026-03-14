@@ -67,6 +67,24 @@ def init_db():
                     );
                 """)
 
+                # Player statistics
+                cur.execute("""
+                    ALTER TABLE users 
+                    ADD COLUMN IF NOT EXISTS currency INTEGER DEFAULT 0,
+                    ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0,
+                    ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1;
+                """)
+
+                # Plants table
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS plants (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        name TEXT NOT NULL,
+                        stage INTEGER DEFAULT 1
+                    );
+                """)
+
     except Exception as e:
         print(f"❌ Initialization failed: {e}")
 
