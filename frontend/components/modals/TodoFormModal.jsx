@@ -128,10 +128,16 @@ export default function TodoFormModal({ mode = 'add', initialData, onSave, onClo
             )}
           </div>
           {onDelete && (
-            <button type="button" className="modal-delete" onClick={() => { onDelete(); onClose() }}>
-              <Trash size={16} />
-              Delete this To Do
-            </button>
+            <div className="modal-danger-footer">
+              <button
+                type="button"
+                className="modal-danger-btn"
+                onClick={() => { onDelete(); onClose() }}
+              >
+                <Trash size={18} weight="regular" />
+                Delete To Do
+              </button>
+            </div>
           )}
         </div>
       </div>
