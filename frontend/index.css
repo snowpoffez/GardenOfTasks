@@ -108,20 +108,97 @@ button, [role="button"], select, .modal-overlay {
   cursor: pointer;
 }
 
+/* Twinkling stars overlay */
+.stars-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Confetti burst (triggered on harvest) */
+.confetti-burst {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.confetti-particle {
+  position: absolute;
+  width: var(--size, 8px);
+  height: var(--size, 8px);
+  background: var(--color, var(--col-gold));
+  border-radius: 2px;
+  opacity: 0;
+  animation: confetti-fly 2s ease-out var(--delay, 0s) forwards;
+  transform-origin: center center;
+}
+@keyframes confetti-fly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx), var(--ty)) rotate(720deg) scale(0.3);
+  }
+}
+
 /* Main app area: green base with purple highlights (strong for visibility) */
 .app-page {
+  position: relative;
   background: radial-gradient(ellipse 90% 60% at 5% 0%, rgba(139, 92, 246, 0.4) 0%, transparent 60%),
     radial-gradient(ellipse 85% 55% at 95% 0%, rgba(139, 92, 246, 0.35) 0%, transparent 58%),
     radial-gradient(ellipse 70% 50% at 90% 100%, rgba(139, 92, 246, 0.25) 0%, transparent 55%),
     linear-gradient(180deg, var(--col-bg-page-light) 0%, var(--col-green-50) 30%, var(--col-green-100) 100%);
   background-color: var(--col-bg-page);
 }
-/* Home / landing hero. To use a nature wallpaper: put the image in frontend/public/
-   (e.g. public/hero.jpg) and add: background-image: url('/hero.jpg');
-   background-size: cover; background-position: center; */
+/* Home / landing: curved purple highlights + moving gradient */
 .home-hero {
-  background: linear-gradient(160deg, var(--col-green-50) 0%, var(--col-green-100) 40%, var(--col-green-200) 100%);
+  position: relative;
+  background: linear-gradient(180deg, var(--col-bg-page-light) 0%, var(--col-green-50) 35%, var(--col-green-100) 100%);
   background-color: var(--col-bg-page);
+  overflow: hidden;
+}
+.home-hero::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  background: radial-gradient(ellipse 80% 40% at 15% 20%, rgba(139, 92, 246, 0.35) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 88% 15%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 35% at 25% 75%, rgba(139, 92, 246, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 45% at 75% 85%, rgba(139, 92, 246, 0.28) 0%, transparent 52%),
+    radial-gradient(ellipse 45% 30% at 50% 40%, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
+  background-size: 120% 120%;
+  animation: home-curves-drift 18s ease-in-out infinite;
+  pointer-events: none;
+}
+.home-hero > * {
+  position: relative;
+  z-index: 1;
+}
+@keyframes home-curves-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+  25% { transform: translate(2%, -1%) scale(1.02); opacity: 0.98; }
+  50% { transform: translate(-1%, 2%) scale(0.98); opacity: 1; }
+  75% { transform: translate(-2%, 1%) scale(1.01); opacity: 0.99; }
 }
 
 /* Accent colours for daily cards (set of greens) */
@@ -533,11 +610,24 @@ button, [role="button"], select, .modal-overlay {
   box-shadow: 0 0 0 2px var(--col-green-400), 0 0 12px var(--col-green-400), 0 0 20px rgba(52, 211, 153, 0.25);
 }
 .garden-slot-harvest {
-  box-shadow: 0 0 0 3px var(--col-green-600), 0 0 20px var(--col-gold-soft), 0 0 32px var(--col-gold-glow);
+  box-shadow: 0 0 0 3px var(--col-gold), 0 0 24px var(--col-gold-soft), 0 0 40px var(--col-gold-glow);
 }
 .harvest-label {
   color: var(--col-gold);
   text-shadow: 0 0 12px var(--col-gold-soft);
+}
+/* Wind sway for growing plants (not yet harvest-ready) */
+.garden-slot-wind {
+  animation: wind-sway 4.5s ease-in-out infinite;
+}
+.garden-slot-wind:hover {
+  animation: none;
+  transform: scale(1.2);
+}
+@keyframes wind-sway {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
 }
 
 @keyframes garden-slot-open-shop-pulse {
@@ -814,6 +904,9 @@ button, [role="button"], select, .modal-overlay {
 .garden-grid-wrapper {
   position: relative;
   display: inline-block;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 0 64px rgba(16, 185, 129, 0.12);
 }
 .garden-full-overlay {
   position: fixed;

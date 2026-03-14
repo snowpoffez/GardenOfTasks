@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CaretDown, CaretRight, Package, TrendUp } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
+import ConfettiBurst from '../components/ConfettiBurst'
 
 const QUEUE_GLOW_COUNT = 3
 const XP_FLOAT_MS = 1500
@@ -20,6 +21,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   const [upgradesOpen, setUpgradesOpen] = useState(false)
   const [shopOpen, setShopOpen] = useState(false)
   const [slotClickedForShop, setSlotClickedForShop] = useState(null)
+  const [confettiTrigger, setConfettiTrigger] = useState(0)
 
   const getSeed = (seedId) => seedsCatalog.find((s) => s.id === seedId)
   const emptySlotsCount = slots.filter((s) => !s).length
@@ -37,7 +39,10 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
     const plant = slots[slotIndex]
     if (plant) {
       const seed = getSeed(plant.seedId)
-      if (seed && plant.currentStage >= seed.stages) onHarvest(slotIndex)
+      if (seed && plant.currentStage >= seed.stages) {
+        setConfettiTrigger((k) => k + 1)
+        onHarvest(slotIndex)
+      }
       return
     }
     if (selectedSeedId) {
@@ -104,6 +109,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
 
   return (
     <div className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6 overflow-auto relative">
+      <ConfettiBurst trigger={confettiTrigger} />
       {showDeselectOverlay && (
         <div className="garden-full-overlay" onClick={handleDeselect} aria-hidden />
       )}
@@ -118,6 +124,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
               const seed = plant ? getSeed(plant.seedId) : null
               const queuePos = queuePosition(slotIndex)
               const isFullyGrown = plant && seed && plant.currentStage >= seed.stages
+              const isGrowing = plant && seed && plant.currentStage < seed.stages
               const label = plant ? `${plant.seedId}${plant.currentStage}` : null
               const raised = showDeselectOverlay && isHole(slotIndex)
               const openShopPing = !plant && slotIndex === slotClickedForShop
@@ -128,7 +135,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
                 <div key={slotIndex} className="garden-slot-wrapper">
                   <button
                     type="button"
-                    className={`garden-slot ${queuePos ? `garden-slot-queue-${queuePos}` : ''} ${isFullyGrown ? 'garden-slot-harvest' : ''} ${raised ? 'garden-slot-raised' : ''} ${openShopPing ? 'garden-slot-open-shop' : ''} ${growPop ? 'garden-slot-grow-pop' : ''}`}
+                    className={`garden-slot ${queuePos ? `garden-slot-queue-${queuePos}` : ''} ${isFullyGrown ? 'garden-slot-harvest' : ''} ${isGrowing ? 'garden-slot-wind' : ''} ${raised ? 'garden-slot-raised' : ''} ${openShopPing ? 'garden-slot-open-shop' : ''} ${growPop ? 'garden-slot-grow-pop' : ''}`}
                     onClick={() => handleSlotClick(slotIndex)}
                     aria-label={plant ? `Plant ${label}, ${isFullyGrown ? 'harvest' : 'growing'}` : 'Empty plot'}
                   >

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from './components/Header'
+import StarsLayer from './components/StarsLayer'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import TaskPage from './pages/TaskPage'
@@ -168,6 +169,7 @@ function App() {
   if (!loggedIn) {
     return (
       <div className="app-page h-full flex flex-col">
+        <StarsLayer />
         {authView === 'home' && (
           <HomePage
             onGoToLogin={() => setAuthView('login')}
@@ -183,6 +185,7 @@ function App() {
 
   return (
     <div className="app-page h-full flex flex-col">
+      <StarsLayer />
       <Header
         user={user}
         stats={{ level: stats.level, xp: stats.xp, maxXp: stats.maxXp, gold: garden.coins }}
