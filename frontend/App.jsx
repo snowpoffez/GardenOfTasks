@@ -47,22 +47,84 @@ function App() {
   const [authView, setAuthView] = useState('home') // 'home' | 'login'
   const [user, setUser] = useState(null) // { username } when logged in
 
-  const { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots } = useGarden()
+  const { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots } = useGarden(user?.user_id)
 
-  const addXp = useCallback((amount) => {
-    if (!amount || amount < 0) return
-    setStats((prev) => {
-      let { level, xp, maxXp } = prev
-      xp += amount
-      while (xp >= maxXp) {
-        xp -= maxXp
-        level += 1
-        maxXp = getMaxXpForLevel(level)
+  // Load level and XP from DB when user logs in
+  useEffect(() => {
+    const uid = user?.user_id
+    if (!uid) return
+    Promise.all([
+      fetch(`/api/users/${uid}/level`).then((r) => r.json()),
+      fetch(`/api/users/${uid}/xp`).then((r) => r.json()),
+    ])
+      .then(([levelRes, xpRes]) => {
+        const level = levelRes?.level ?? 1
+        const xp = xpRes?.xp ?? 0
+        setStats((prev) => ({
+          ...prev,
+          level,
+          xp,
+          maxXp: getMaxXpForLevel(level),
+        }))
+      })
+      .catch((err) => console.error('Failed to load level/xp:', err))
+  }, [user?.user_id])
+
+  const statsRef = useRef(stats)
+  useEffect(() => {
+    statsRef.current = stats
+  }, [stats])
+
+  const addXp = useCallback(
+    (amount) => {
+      if (!amount || amount < 0) return
+      const uid = user?.user_id
+      const amt = Math.round(amount)
+      setLastEarnedXp((prev) => (prev ?? 0) + amt)
+
+      if (uid) {
+        fetch(`/api/users/${uid}/add-xp`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ xp_gain: amt }),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            const newXp = data?.new_xp ?? 0
+            setStats((prev) => ({ ...prev, xp: newXp }))
+            const currentLevel = statsRef.current?.level ?? 1
+            const maxXp = getMaxXpForLevel(currentLevel)
+            if (newXp >= maxXp) {
+              return fetch(`/api/users/${uid}/level-up`, { method: 'POST' })
+                .then((r) => r.json())
+                .then((levelData) => {
+                  if (levelData?.new_level) {
+                    setStats((prev) => ({
+                      ...prev,
+                      level: levelData.new_level,
+                      xp: 0,
+                      maxXp: getMaxXpForLevel(levelData.new_level),
+                    }))
+                  }
+                })
+            }
+          })
+          .catch((err) => console.error('Failed to add XP:', err))
+      } else {
+        setStats((prev) => {
+          let { level, xp, maxXp } = prev
+          xp += amt
+          while (xp >= maxXp) {
+            xp -= maxXp
+            level += 1
+            maxXp = getMaxXpForLevel(level)
+          }
+          return { ...prev, level, xp, maxXp }
+        })
       }
-      return { ...prev, level, xp, maxXp }
-    })
-    setLastEarnedXp((prev) => (prev ?? 0) + amount)
-  }, [])
+    },
+    [user?.user_id]
+  )
 
   const clearLastEarnedXp = useCallback(() => setLastEarnedXp(null), [])
 

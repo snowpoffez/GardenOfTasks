@@ -274,7 +274,7 @@ def get_user_dailies(user_id: int):
         with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, task_name, description, xp, status FROM dailies WHERE user_id = %s",
+                    "SELECT id, task_name, description, xp, status, checked FROM dailies WHERE user_id = %s",
                     (user_id,)
                 )
                 return cur.fetchall()

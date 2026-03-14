@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds } from '../constants/tasks'
 
 export function useTasks(addGrowth, userId, onEarnXp) {
   const [dailies, setDailies] = useState([])
   const [dailyOrderIds, setDailyOrderIds] = useState([])
+  const checkedFromIndexRef = useRef({})
   const [todos, setTodos] = useState([])
   const [todoTab, setTodoTab] = useState('active')
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
@@ -34,11 +35,11 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     if (!userId) return
     fetch(`/api/dailies/${userId}`)
         .then(res => res.json())
-        .then(dailies => {  
-            setDailies(dailies.map(d => ({
+        .then(dailies => {
+            const mapped = dailies.map(d => ({
                 id: `daily-${d.id}`,
                 title: d.task_name,
-                checked: d.checked,
+                checked: Boolean(d.checked),
                 notes: d.description,
                 accentColor: d.accent_color || DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)],
                 repeatInterval: d.repeat_interval || 'Daily',
@@ -46,7 +47,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
                 repeatUnit: d.repeat_unit || 'day',
                 dueDate: d.due_date || '',
                 count: 0,
-            })))
+            }))
+            setDailies(mapped)
+            setDailyOrderIds(mapped.map((d) => d.id))
         })
         .catch(err => console.error('Failed to load dailies:', err))
   }, [userId])
@@ -62,6 +65,27 @@ export function useTasks(addGrowth, userId, onEarnXp) {
 
     const newChecked = daily ? !daily.checked : false
     setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
+    if (newChecked) {
+      setDailyOrderIds((prev) => {
+        const idx = prev.indexOf(dailyId)
+        if (idx === -1) return [...prev, dailyId]
+        checkedFromIndexRef.current[dailyId] = idx
+        const next = prev.filter((id) => id !== dailyId)
+        next.push(dailyId)
+        return next
+      })
+    } else {
+      const fromIndex = checkedFromIndexRef.current[dailyId]
+      if (fromIndex != null) {
+        setDailyOrderIds((prev) => {
+          const without = prev.filter((id) => id !== dailyId)
+          const insertAt = Math.min(fromIndex, without.length)
+          without.splice(insertAt, 0, dailyId)
+          return without
+        })
+        delete checkedFromIndexRef.current[dailyId]
+      }
+    }
 
     const dbId = dailyId.toString().replace('daily-', '')
     if (userId && !isNaN(dbId)) {

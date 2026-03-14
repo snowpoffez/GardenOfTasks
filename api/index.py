@@ -55,6 +55,7 @@ class DailyUpdate(BaseModel):
     description: str | None = None
     xp: int | None = None
     status: str | None = None
+    checked: bool | None = None
 
 class CurrencyRequest(BaseModel):
     amount: int
