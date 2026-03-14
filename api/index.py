@@ -28,16 +28,55 @@ def health():
 async def germinate(request: AssignmentRequest):
     if DEBUG_MODE: 
         return {"quests": [
-            "Task 1: Research the topic and gather relevant information. (XP: 20)",
-            "Task 2: Create an outline for the assignment. (XP: 15)",
-            "Task 3: Write the introduction and main body. (XP: 30)",
-            "Task 4: Edit and proofread the content. (XP: 25)",
-            "Task 5: Submit the assignment on time. (XP: 10)"
+            {
+                "id": 1,
+                "task_name": "Gathering Moss",
+                "description": "Research 3 primary sources for the history essay.",
+                "xp": 50,
+                "category": "Research",
+                "status": "pending"
+            },
+            {
+                "id": 2,
+                "task_name": "Rooting the Narrative",
+                "description": "Outline the introductory paragraph.",
+                "xp": 30,
+                "category": "Drafting",
+                "status": "pending"
+            }
         ]}
     else:
         try:
-            prompt = f"Break this assignment into 5 tasks with XP: {request.text}"
-            
+            prompt = f"""
+            Break the following assignment into any number of nature-themed tasks that you see fit: "History Essay"
+
+            You must return the data strictly as a JSON list of objects.
+
+            Do not include any conversational text, markdown formatting, or backticks.
+
+            Each object must follow this exact schema:
+
+
+
+            - "id": An integer starting from 1.
+
+            - "task_name": A creative nature-themed title for the task.
+
+            - "description": A clear instruction on what the user needs to do.
+
+            - "xp": An integer between 10 and 100 based on difficulty.
+
+            - "status": A string that must be exactly "pending".
+
+            Example Output:
+
+            [
+
+            {{"id": 1, "task_name": "Clearing the Brush", "description": "Organize notes", "xp": 20, "status": "pending"}}
+
+            ]
+
+            """
             # Using the 2026 standard Gemini 3 model
             response = client.models.generate_content(
                 model="gemini-3-flash-preview", 
