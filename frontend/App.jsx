@@ -52,7 +52,10 @@ function App() {
   // Load level and XP from DB when user logs in
   useEffect(() => {
     const uid = user?.user_id
-    if (!uid) return
+    if (!uid) {
+      setStats(initialStats)
+      return
+    } 
     Promise.all([
       fetch(`/api/users/${uid}/level`).then((r) => r.json()),
       fetch(`/api/users/${uid}/xp`).then((r) => r.json()),
