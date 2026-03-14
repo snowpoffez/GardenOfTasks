@@ -49,6 +49,23 @@ node_modules/
 .rts2_cache_es/
 .rts2_cache_umd/
 
+# Python
+__pycache__/
+api/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.pytest_cache/
+
 # Optional REPL history
 .node_repl_history
 
@@ -91,3 +108,6 @@ dist/
 .venv
 .vercel
 .env*.local
+
+#Pycache
+api/__pycache__/
