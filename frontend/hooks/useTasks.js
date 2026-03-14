@@ -7,7 +7,7 @@ export function useTasks(addGrowth) {
   const [dailyOrderIds, setDailyOrderIds] = useState(initialDailyOrderIds)
   const [todos, setTodos] = useState(initialTodos)
   const [todoTab, setTodoTab] = useState('active')
-  const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo'
+  const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
   const [editingTodoId, setEditingTodoId] = useState(null)
   const [editingDailyId, setEditingDailyId] = useState(null)
 

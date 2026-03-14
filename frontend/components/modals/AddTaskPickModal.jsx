@@ -1,4 +1,6 @@
-export default function AddTaskPickModal({ onPickDaily, onPickTodo, onClose }) {
+import { Sparkle } from '@phosphor-icons/react'
+
+export default function AddTaskPickModal({ onPickDaily, onPickTodo, onPickGenerateAI, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '20rem' }}>
@@ -19,6 +21,14 @@ export default function AddTaskPickModal({ onPickDaily, onPickTodo, onClose }) {
             onClick={onPickTodo}
           >
             To Do
+          </button>
+          <button
+            type="button"
+            className="w-full py-3 px-4 rounded-lg text-left font-medium flex items-center gap-2 btn-accent"
+            onClick={onPickGenerateAI}
+          >
+            <Sparkle size={18} weight="fill" />
+            Generate with AI
           </button>
         </div>
       </div>

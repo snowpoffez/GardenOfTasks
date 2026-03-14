@@ -5,6 +5,7 @@ import TodoItem from '../components/tasks/TodoItem'
 import AddTaskPickModal from '../components/modals/AddTaskPickModal'
 import TodoFormModal from '../components/modals/TodoFormModal'
 import DailyFormModal from '../components/modals/DailyFormModal'
+import GenerateAITaskModal from '../components/modals/GenerateAITaskModal'
 
 function moveIndex(arr, fromIndex, toIndex) {
   if (fromIndex === toIndex) return arr
@@ -30,6 +31,7 @@ export default function TaskPage({
   addTaskModal,
   onPickTodo,
   onPickDaily,
+  onPickGenerateAI,
   onTodoToggle,
   onUndo,
   canUndo,
@@ -197,7 +199,18 @@ export default function TaskPage({
       </div>
 
       {addTaskModal === 'pick' && (
-        <AddTaskPickModal onPickDaily={onPickDaily} onPickTodo={onPickTodo} onClose={onCloseAddTask} />
+        <AddTaskPickModal
+          onPickDaily={onPickDaily}
+          onPickTodo={onPickTodo}
+          onPickGenerateAI={onPickGenerateAI}
+          onClose={onCloseAddTask}
+        />
+      )}
+      {addTaskModal === 'generate-ai' && (
+        <GenerateAITaskModal
+          onGenerated={onAddTodo}
+          onClose={onCloseAddTask}
+        />
       )}
       {(addTaskModal === 'todo' || editingTodoId) && (
         <TodoFormModal

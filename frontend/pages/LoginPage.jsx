@@ -34,7 +34,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     setError('')
     if (!password.trim()) return
     // Mock login success; replace with: await api.post('/auth/login', { username, password })
-    setTimeout(() => onLoginSuccess(), 200)
+    setTimeout(() => onLoginSuccess({ username: username.trim() }), 200)
   }
 
   const handleSignupSubmit = (e) => {
@@ -45,7 +45,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
       return
     }
     // Mock signup success; replace with: await api.post('/auth/signup', { username, password })
-    setTimeout(() => onLoginSuccess(), 200)
+    setTimeout(() => onLoginSuccess({ username: username.trim() }), 200)
   }
 
   const resetToIdentify = () => {
