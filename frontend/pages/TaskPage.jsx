@@ -46,6 +46,7 @@ export default function TaskPage({
   onEditTodo,
   onEditDaily,
   onDeleteTodo,
+  onDeleteDaily,
 }) {
   const activeTodos = todos.filter((t) => !t.completed)
   const completedTodos = todos.filter((t) => t.completed)
@@ -227,6 +228,7 @@ export default function TaskPage({
           initialData={editingDailyId ? dailies.find((d) => d.id === editingDailyId) : undefined}
           onSave={editingDailyId ? onEditDaily : onAddDaily}
           onClose={editingDailyId ? onCloseEdit : onCloseAddTask}
+          onDelete={editingDailyId ? () => onDeleteDaily(editingDailyId) : undefined}
         />
       )}
     </>

@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { Trash } from '@phosphor-icons/react'
 import StarRating from '../StarRating'
 
 const REPEAT_OPTIONS = ['Daily', 'Weekly', 'Monthly', 'Yearly']
 
-export default function DailyFormModal({ mode = 'add', initialData, onSave, onClose }) {
+export default function DailyFormModal({ mode = 'add', initialData, onSave, onClose, onDelete }) {
   const [title, setTitle] = useState(initialData?.title ?? '')
   const [notes, setNotes] = useState(initialData?.notes ?? '')
   const [value, setValue] = useState(initialData?.rewardAmount ?? initialData?.damageAmount ?? 3)
@@ -112,6 +113,18 @@ export default function DailyFormModal({ mode = 'add', initialData, onSave, onCl
               maxLength={10}
             />
           </div>
+          {onDelete && (
+            <div className="modal-danger-footer">
+              <button
+                type="button"
+                className="modal-danger-btn"
+                onClick={() => { onDelete(); onClose() }}
+              >
+                <Trash size={18} weight="regular" />
+                Delete Daily
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

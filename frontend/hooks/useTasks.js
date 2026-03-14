@@ -96,6 +96,12 @@ export function useTasks(addGrowth, userId) {
     setDailyOrderIds(newOrder)
   }, [push])
 
+  const deleteDaily = useCallback((id) => {
+    push()
+    setDailies((prev) => prev.filter((d) => d.id !== id))
+    setDailyOrderIds((prev) => prev.filter((orderId) => orderId !== id))
+    setEditingDailyId(null)
+  }, [push])
   // --- Todo actions ---
 
   const toggleTodo = useCallback((todoId) => {
@@ -176,7 +182,7 @@ export function useTasks(addGrowth, userId) {
     editingTodoId, editingDailyId,
     canUndo,
     // actions
-    toggleDaily, addDaily, editDaily, resetDailies, reorderDailies,
+    toggleDaily, addDaily, editDaily, deleteDaily, resetDailies, reorderDailies,
     toggleTodo, addTodo, editTodo, deleteTodo, reorderTodos,
     undo,
     openAddTask, closeAddTask, openEditTodo, openEditDaily, closeEdit,

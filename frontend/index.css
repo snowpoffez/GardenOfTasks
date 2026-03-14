@@ -362,6 +362,36 @@ button, [role="button"], select, .modal-overlay {
 .modal-delete:hover {
   text-decoration: underline;
 }
+
+/* Danger footer at bottom of edit modals */
+.modal-danger-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--col-border);
+}
+.modal-danger-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--col-danger);
+  background: transparent;
+  border: 1px solid var(--col-danger);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.modal-danger-btn:hover {
+  background-color: var(--col-danger);
+  color: var(--col-bg-card);
+}
+.modal-danger-btn:active {
+  opacity: 0.9;
+}
 .star-rating {
   display: flex;
   gap: 0.25rem;

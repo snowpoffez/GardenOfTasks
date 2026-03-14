@@ -103,6 +103,7 @@ function App() {
           onEditTodo={tasks.editTodo}
           onEditDaily={tasks.editDaily}
           onDeleteTodo={tasks.deleteTodo}
+          onDeleteDaily={tasks.deleteDaily}
         />
       )}
 
