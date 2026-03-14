@@ -34,11 +34,11 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     if (!userId) return
     fetch(`/api/dailies/${userId}`)
         .then(res => res.json())
-        .then(dailies => {  
-            setDailies(dailies.map(d => ({
+        .then(dailies => {
+            const mapped = dailies.map(d => ({
                 id: `daily-${d.id}`,
                 title: d.task_name,
-                checked: d.checked,
+                checked: Boolean(d.checked),
                 notes: d.description,
                 accentColor: d.accent_color || DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)],
                 repeatInterval: d.repeat_interval || 'Daily',
@@ -46,7 +46,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
                 repeatUnit: d.repeat_unit || 'day',
                 dueDate: d.due_date || '',
                 count: 0,
-            })))
+            }))
+            setDailies(mapped)
+            setDailyOrderIds(mapped.map((d) => d.id))
         })
         .catch(err => console.error('Failed to load dailies:', err))
   }, [userId])
@@ -62,6 +64,16 @@ export function useTasks(addGrowth, userId, onEarnXp) {
 
     const newChecked = daily ? !daily.checked : false
     setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
+    // Move completed daily to end of order so it reorders to bottom
+    if (newChecked) {
+      setDailyOrderIds((prev) => {
+        const idx = prev.indexOf(dailyId)
+        if (idx === -1) return [...prev, dailyId]
+        const next = prev.filter((id) => id !== dailyId)
+        next.push(dailyId)
+        return next
+      })
+    }
 
     const dbId = dailyId.toString().replace('daily-', '')
     if (userId && !isNaN(dbId)) {
