@@ -76,6 +76,10 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: clamp(16px, 1.35vw, 20px);
+}
+
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -432,6 +436,30 @@ button, [role="button"], select, .modal-overlay {
   background-color: var(--col-bg-card);
   padding: 1.25rem 1.25rem;
 }
+.garden-shop-seed-list {
+  max-height: min(20rem, 50vh);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.25rem;
+  margin-right: -0.25rem;
+}
+.garden-shop-seed-list::-webkit-scrollbar {
+  width: 8px;
+}
+.garden-shop-seed-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.garden-shop-seed-list::-webkit-scrollbar-thumb {
+  background: var(--col-green-500);
+  border-radius: 4px;
+}
+.garden-shop-seed-list::-webkit-scrollbar-thumb:hover {
+  background: var(--col-green-600);
+}
+.garden-shop-seed-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--col-green-500) transparent;
+}
 .garden-shop-card {
   border-radius: 0.5rem;
   border: 1px solid var(--col-border);
@@ -442,6 +470,56 @@ button, [role="button"], select, .modal-overlay {
 .garden-shop-card.btn-disabled {
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+.garden-shop-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: width 0.2s ease;
+}
+.garden-shop-sidebar-collapsed {
+  width: auto;
+}
+.garden-shop-sidebar-open {
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .garden-shop-sidebar-open {
+    width: 16rem;
+  }
+}
+.garden-shop-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--col-border);
+  background-color: var(--col-bg-card);
+  color: var(--col-text-heading);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.garden-shop-sidebar-open .garden-shop-toggle {
+  width: 100%;
+}
+.garden-shop-toggle:hover {
+  background-color: var(--col-bg-hover, rgba(0, 0, 0, 0.04));
+}
+.garden-shop-toggle svg:first-of-type {
+  color: var(--col-accent);
+  flex-shrink: 0;
+}
+.garden-shop-toggle-label {
+  flex: 1;
+  text-align: left;
+}
+.garden-shop-sidebar-collapsed .garden-shop-toggle-label {
+  white-space: nowrap;
 }
 
 .garden-upgrades-sidebar {

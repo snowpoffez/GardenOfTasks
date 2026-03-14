@@ -68,7 +68,7 @@ export default function TaskPage({
   return (
     <>
       <div className="flex-1 min-h-0 flex flex-col" style={{ backgroundColor: 'var(--col-bg-page)' }}>
-        <div className="flex justify-end gap-2 pt-5 pb-2 pr-20">
+        <div className="flex justify-end gap-2 pt-5 pb-2 pr-[5rem]">
           <button
             type="button"
             onClick={onResetDailies}
@@ -95,7 +95,7 @@ export default function TaskPage({
           </button>
         </div>
 
-        <div className="flex flex-1 justify-center px-20 pb-6 min-h-0">
+        <div className="flex flex-1 justify-center px-[5rem] pb-6 min-h-0">
           <div className="w-5/6 flex gap-8 min-h-0">
 
             {/* Dailies column */}

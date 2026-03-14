@@ -45,10 +45,17 @@ export function useGarden() {
       if (!plant) return prev
       const seed = SEEDS_CATALOG.find((s) => s.id === plant.seedId)
       if (!seed || plant.currentStage < seed.stages) return prev
+      const earned = seed.cost + HARVEST_PROFIT
+      if (seed.repeatHarvest) {
+        const slots = [...prev.slots]
+        slots[slotIndex] = { seedId: plant.seedId, currentStage: seed.stages - 1 }
+        const growthQueue = prev.growthQueue.filter((i) => i !== slotIndex)
+        growthQueue.push(slotIndex)
+        return { ...prev, coins: prev.coins + earned, slots, growthQueue }
+      }
       const slots = [...prev.slots]
       slots[slotIndex] = null
       const growthQueue = prev.growthQueue.filter((i) => i !== slotIndex)
-      const earned = seed.cost + HARVEST_PROFIT
       return { ...prev, coins: prev.coins + earned, slots, growthQueue }
     })
   }, [])
