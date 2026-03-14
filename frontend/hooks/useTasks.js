@@ -3,8 +3,8 @@ import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds, initialTodos
 import { useHistory } from './useHistory'
 
 export function useTasks(addGrowth, userId, onEarnXp) {
-  const [dailies, setDailies] = useState(initialDailies)
-  const [dailyOrderIds, setDailyOrderIds] = useState(initialDailyOrderIds)
+  const [dailies, setDailies] = useState([])
+  const [dailyOrderIds, setDailyOrderIds] = useState([])
   const [todos, setTodos] = useState([])
   const [todoTab, setTodoTab] = useState('active')
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
