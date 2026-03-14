@@ -1,0 +1,22 @@
+- Level 10
+    - Damage based on Strength
+    - Costs 10 MP
+    - Damage (no crit) $= \sqrt{\text{STR}}$
+- Level 15
+    - Experience based on Intelligence
+    - Costs 15 MP
+    - XP $= 2.5\sqrt{\text{INT}}$
+- Level 20
+    - Heal
+    - Costs 20 MP
+    - Healing is 10% of health
+- Level 25
+    - Gold based on Perception
+    - Costs 25 MP
+    - GP $= 1.25\sqrt{\text{PER}}$
+- Level 35
+    - Streak freeze
+    - Costs 50 MP
+    - Damage is still taken
+- Level 50
+    - Stat buffs (4 separate skills) based on each stat

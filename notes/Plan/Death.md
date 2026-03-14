@@ -1,0 +1,12 @@
+- Lose all gold
+- Lose one level, but keep the XP progress. Edge cases:
+    - If the player would level up if they lost the level, then remove all XP progress without changing the level
+    - If the player is at level 1, then remove all XP without changing the level
+    - If the player drops below the level to unlock a skill, lock the skill
+    - Buff effects are saved
+    - Non-allocated stat points are not lost on death
+- Lose one allocated stat point, picked from a random point, not from a random stat
+    - Edge case: if the player does not have any stat points allocated, take one away from the non-allocated stat points
+- Temporary stat debuff of 10% on all stats until 3\*N tasks are done
+    - N is the number of dailies the player has
+    - Display progress bar near quest in header

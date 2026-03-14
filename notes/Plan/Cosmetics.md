@@ -1,0 +1,5 @@
+- Character won't be rendered because that requires too much graphic design
+- Colour themes
+    - For whole app
+    - Some expensive ones can be purchased with gold
+    - Others can be purchased with gems
