@@ -5,7 +5,7 @@ from google import genai
 import psycopg
 import os
 from dotenv import load_dotenv
-from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks, create_daily, delete_daily, get_user_dailies, update_daily_partial, update_task_partial, add_user_currency, add_user_xp, level_up_user, get_user_currency, get_user_xp, get_user_level
+from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks, create_daily, delete_daily, get_user_dailies, update_daily_partial, update_task_partial, add_user_currency, add_user_xp, level_up_user, get_user_currency, get_user_xp, get_user_level, get_user_plants, add_plant_route, grow_plant_route, remove_plant_route, delete_plant, increment_plant_stage,create_plant
 
 # Debug mode for saving API resources during development
 DEBUG_MODE = False # False in production to ensure full functionality
@@ -348,3 +348,30 @@ def get_currency_route(user_id: int):
         raise HTTPException(status_code=404, detail=str(e))
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/api/plants")
+def add_plant_route(user_id: int, name: str):
+    return create_plant(user_id, name)
+
+@app.patch("/api/plants/{plant_id}/grow")
+def grow_plant_route(plant_id: int):
+    try:
+        return increment_plant_stage(plant_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@app.delete("/api/plants/{plant_id}")
+def remove_plant_route(plant_id: int):
+    try:
+        return delete_plant(plant_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@app.get("/api/users/{user_id}/plants")
+def get_plants_route(user_id: int):
+    """Returns a list of all plants for the user."""
+    try:
+        plants = get_user_plants(user_id)
+        return plants
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Could not retrieve garden data")

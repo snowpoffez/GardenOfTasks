@@ -57,6 +57,16 @@ def init_db():
                         due_date TEXT
                     );
                 """)
+
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS plants (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        name TEXT NOT NULL,
+                        stage INTEGER DEFAULT 1
+                    );
+                """)
+
     except Exception as e:
         print(f"❌ Initialization failed: {e}")
 
@@ -435,4 +445,64 @@ def get_user_currency(user_id: int):
                 return result["currency"]
     except Exception as e:
         print(f"Error fetching currency: {e}")
+        raise
+
+#PLANTS
+def create_plant(user_id: int, name: str):
+    """Adds a new plant at stage 1 for a specific user."""
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO plants (user_id, name, stage) VALUES (%s, %s, 1) RETURNING id",
+                    (user_id, name)
+                )
+                new_plant_id = cur.fetchone()[0]
+                return {"success": True, "plant_id": new_plant_id}
+    except Exception as e:
+        print(f"Error creating plant: {e}")
+        raise
+
+def increment_plant_stage(plant_id: int):
+    """Increments the growth stage of a plant by 1."""
+    try:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE plants SET stage = stage + 1 WHERE id = %s RETURNING stage",
+                    (plant_id,)
+                )
+                result = cur.fetchone()
+                if not result:
+                    raise ValueError("Plant not found")
+                return {"success": True, "new_stage": result["stage"]}
+    except Exception as e:
+        print(f"Error growing plant: {e}")
+        raise
+
+def delete_plant(plant_id: int):
+    """Removes a plant from the database."""
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM plants WHERE id = %s", (plant_id,))
+                if cur.rowcount == 0:
+                    raise ValueError("Plant not found")
+                return {"success": True, "message": f"Plant {plant_id} removed"}
+    except Exception as e:
+        print(f"Delete Plant Error: {e}")
+        raise
+
+def get_user_plants(user_id: int):
+    """Retrieves all plants belonging to a specific user."""
+    try:
+        with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT id, name, stage FROM plants WHERE user_id = %s",
+                    (user_id,)
+                )
+                return cur.fetchall()
+    except Exception as e:
+        print(f"Error fetching plants: {e}")
         raise
