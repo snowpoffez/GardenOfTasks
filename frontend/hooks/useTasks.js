@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds, initialTodos } from '../constants/tasks'
 import { useHistory } from './useHistory'
 
-export function useTasks(addGrowth, userId) {
+export function useTasks(addGrowth, userId, onEarnXp) {
   const [dailies, setDailies] = useState(initialDailies)
   const [dailyOrderIds, setDailyOrderIds] = useState(initialDailyOrderIds)
   const [todos, setTodos] = useState([])
@@ -60,8 +60,10 @@ export function useTasks(addGrowth, userId) {
 
   const toggleDaily = useCallback((dailyId) => {
     const daily = dailies.find((d) => d.id === dailyId)
-    if (!daily) return
-    if (!daily.checked) addGrowth(1)
+    if (daily && !daily.checked) {
+      onEarnXp?.(daily.rewardAmount ?? daily.damageAmount ?? 5)
+      addGrowth(1)
+    }
     push()
 
     const newChecked = !daily.checked
@@ -140,7 +142,10 @@ export function useTasks(addGrowth, userId) {
   const toggleTodo = useCallback((todoId) => {
     const todo = todos.find((t) => t.id === todoId)
     if (!todo) return
-    if (!todo.completed) addGrowth(2)
+    if (!todo.completed) {
+      onEarnXp?.(todo.rewardAmount ?? todo.damageAmount ?? 5)
+      addGrowth(2)
+    }
     push()
 
     const newCompleted = !todo.completed
@@ -155,7 +160,7 @@ export function useTasks(addGrowth, userId) {
         body: JSON.stringify({ status: newCompleted ? 'completed' : 'todo' })
       }).catch(err => console.error('Failed to update task:', err))
     }
-  }, [push, todos, addGrowth, userId])
+  }, [push, todos, addGrowth, onEarnXp, userId])
 
   const addTodo = useCallback(async (data) => {
     push()

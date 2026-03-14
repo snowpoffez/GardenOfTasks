@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Header from './components/Header'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
@@ -11,23 +12,68 @@ import { useGarden } from './hooks/useGarden'
 import { useTasks } from './hooks/useTasks'
 import { SEEDS_CATALOG, UPGRADES_CATALOG, MAX_GARDEN_SLOTS, getGridUpgradeCost } from './constants/garden'
 
+const PATHS = {
+  greenhouse: '/greenhouse',
+  garden: '/garden',
+  arboretum: '/arboretum',
+  profile: '/profile',
+  settings: '/settings',
+}
+const PATH_TO_PAGE = Object.fromEntries(Object.entries(PATHS).map(([k, v]) => [v, k]))
+
+function pathnameToPage(pathname) {
+  return PATH_TO_PAGE[pathname] ?? 'greenhouse'
+}
+
 const initialStats = {
-  level: 5,
-  xp: 3,
-  maxXp: 150,
+  level: 1,
+  xp: 0,
+  maxXp: 100,
   gold: 42.3,
 }
 
+function getMaxXpForLevel(level) {
+  return 100 + (level - 1) * 50
+}
+
 function App() {
-  const [stats] = useState(initialStats)
-  const [currentPage, setCurrentPage] = useState('greenhouse')
+  const [stats, setStats] = useState(initialStats)
+  const [lastEarnedXp, setLastEarnedXp] = useState(null) // amount to show beside plant on garden
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const currentPage = pathnameToPage(pathname)
   const [loggedIn, setLoggedIn] = useState(false)
   const [authView, setAuthView] = useState('home') // 'home' | 'login'
   const [user, setUser] = useState(null) // { username } when logged in
 
-  const { garden, addGrowth, plantSeed, harvest, buyUpgrade } = useGarden()
+  const { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots } = useGarden()
 
-  const tasks = useTasks(addGrowth, user?.user_id)
+  const addXp = useCallback((amount) => {
+    if (!amount || amount < 0) return
+    setStats((prev) => {
+      let { level, xp, maxXp } = prev
+      xp += amount
+      while (xp >= maxXp) {
+        xp -= maxXp
+        level += 1
+        maxXp = getMaxXpForLevel(level)
+      }
+      return { ...prev, level, xp, maxXp }
+    })
+    setLastEarnedXp((prev) => (prev ?? 0) + amount)
+  }, [])
+
+  const clearLastEarnedXp = useCallback(() => setLastEarnedXp(null), [])
+
+  const tasks = useTasks(addGrowth, user?.user_id, addXp)
+
+  useEffect(() => {
+    if (garden.lastGrownSlots?.length > 0) navigate(PATHS.garden)
+  }, [garden.lastGrownSlots, navigate])
+
+  useEffect(() => {
+    if (loggedIn && pathname === '/') navigate(PATHS.greenhouse, { replace: true })
+  }, [loggedIn, pathname, navigate])
 
   const activeTodoCount = tasks.todos.filter((t) => !t.completed).length
   const incompleteDailyCount = tasks.dailies.filter((d) => !d.checked).length
@@ -35,15 +81,17 @@ function App() {
   const handleLoginSuccess = useCallback((userData) => {
     setUser(userData ?? { username: 'Gardener' })
     setLoggedIn(true)
-    setCurrentPage('greenhouse')
-  }, [])
+    navigate(PATHS.greenhouse)
+  }, [navigate])
 
   const handleLogout = useCallback(() => {
     setUser(null)
     setLoggedIn(false)
-    setCurrentPage('greenhouse')
+    navigate(PATHS.greenhouse)
     setAuthView('home')
-  }, [])
+  }, [navigate])
+
+  const handleNavigate = useCallback((page) => navigate(PATHS[page] ?? PATHS.greenhouse), [navigate])
 
   if (!loggedIn) {
     return (
@@ -51,7 +99,7 @@ function App() {
         {authView === 'home' && (
           <HomePage
             onGoToLogin={() => setAuthView('login')}
-            onDevEnter={() => { setUser({ username: 'Gardener' }); setLoggedIn(true); setCurrentPage('greenhouse') }}
+            onDevEnter={() => { setUser({ username: 'Gardener' }); setLoggedIn(true); navigate(PATHS.greenhouse) }}
           />
         )}
         {authView === 'login' && (
@@ -67,7 +115,7 @@ function App() {
         user={user}
         stats={{ level: stats.level, xp: stats.xp, maxXp: stats.maxXp, gold: garden.coins }}
         currentPage={currentPage}
-        onNavigate={setCurrentPage}
+        onNavigate={handleNavigate}
         onLogout={handleLogout}
       />
 
@@ -116,6 +164,10 @@ function App() {
           onPlant={plantSeed}
           onHarvest={harvest}
           onBuyUpgrade={buyUpgrade}
+          lastGrownSlots={garden.lastGrownSlots ?? []}
+          onClearGrownSlots={clearLastGrownSlots}
+          lastEarnedXp={lastEarnedXp}
+          onClearLastEarnedXp={clearLastEarnedXp}
         />
       )}
 

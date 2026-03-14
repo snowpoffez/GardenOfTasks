@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CaretLeft, CaretRight, Package, TrendUp } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
 
 const QUEUE_GLOW_COUNT = 3
+const GROW_ANIMATION_MS = 400
+const XP_FLOAT_MS = 1500
 
 const deselectAll = (setters) => {
   setters.setSelectedSeedId(null)
@@ -10,7 +12,7 @@ const deselectAll = (setters) => {
   setters.setPendingSlotIndex(null)
 }
 
-export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUpgradeCost, onPlant, onHarvest, onBuyUpgrade }) {
+export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUpgradeCost, onPlant, onHarvest, onBuyUpgrade, lastGrownSlots = [], onClearGrownSlots, lastEarnedXp, onClearLastEarnedXp }) {
   const { coins, slots, growthQueue } = garden
   const [selectedSeedId, setSelectedSeedId] = useState(null)
   const [waitingForSeed, setWaitingForSeed] = useState(false)
@@ -18,6 +20,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   const [popupMessage, setPopupMessage] = useState(null)
   const [upgradesOpen, setUpgradesOpen] = useState(false)
   const [shopOpen, setShopOpen] = useState(false)
+  const [slotClickedForShop, setSlotClickedForShop] = useState(null)
 
   const getSeed = (seedId) => seedsCatalog.find((s) => s.id === seedId)
   const emptySlotsCount = slots.filter((s) => !s).length
@@ -46,12 +49,16 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
       }
       return
     }
+    // Empty slot, no seed selected: open shop with animation
+    setSlotClickedForShop(slotIndex)
+    setShopOpen(true)
     if (!canAffordAny) {
       setPopupMessage("You can't afford any seeds.")
-      return
+    } else {
+      setPendingSlotIndex(slotIndex)
+      setWaitingForSeed(true)
     }
-    setPendingSlotIndex(slotIndex)
-    setWaitingForSeed(true)
+    setTimeout(() => setSlotClickedForShop(null), 450)
   }
 
   const handleSelectSeed = (seedId, canAfford, isSelected) => {
@@ -76,7 +83,25 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   const isHole = (slotIndex) =>
     selectedSeedId ? !slots[slotIndex] : waitingForSeed && slotIndex === pendingSlotIndex
 
+  const handleShopToggle = () => {
+    if (shopOpen) {
+      handleDeselect()
+      setShopOpen(false)
+    } else {
+      setShopOpen(true)
+    }
+  }
+
   const gridCols = Math.ceil(Math.sqrt(slots.length))
+
+  useEffect(() => {
+    if (lastGrownSlots.length === 0) return
+    const t = setTimeout(() => {
+      onClearGrownSlots?.()
+      onClearLastEarnedXp?.()
+    }, XP_FLOAT_MS)
+    return () => clearTimeout(t)
+  }, [lastGrownSlots, onClearGrownSlots, onClearLastEarnedXp])
 
   return (
     <div
@@ -165,30 +190,40 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
               const isFullyGrown = plant && seed && plant.currentStage >= seed.stages
               const label = plant ? `${plant.seedId}${plant.currentStage}` : null
               const raised = showDeselectOverlay && isHole(slotIndex)
+              const openShopPing = !plant && slotIndex === slotClickedForShop
+              const growPop = plant && lastGrownSlots.includes(slotIndex)
+              const firstGrownSlot = lastGrownSlots[0]
+              const showXpFloat = firstGrownSlot === slotIndex && lastEarnedXp != null
               return (
-                <button
-                  key={slotIndex}
-                  type="button"
-                  className={`garden-slot ${queuePos ? `garden-slot-queue-${queuePos}` : ''} ${isFullyGrown ? 'garden-slot-harvest' : ''} ${raised ? 'garden-slot-raised' : ''}`}
-                  onClick={() => handleSlotClick(slotIndex)}
-                  aria-label={plant ? `Plant ${label}, ${isFullyGrown ? 'harvest' : 'growing'}` : 'Empty plot'}
-                >
-                  {label ? (
-                    <>
-                      <span
-                        className="text-2xl sm:text-3xl font-bold tabular-nums"
-                        style={{ color: 'var(--col-text-heading)' }}
-                      >
-                        {label}
-                      </span>
-                      {isFullyGrown && (
-                        <span className="text-sm font-medium mt-1" style={{ color: 'var(--col-accent)' }}>
-                          Harvest
+                <div key={slotIndex} className="garden-slot-wrapper">
+                  <button
+                    type="button"
+                    className={`garden-slot ${queuePos ? `garden-slot-queue-${queuePos}` : ''} ${isFullyGrown ? 'garden-slot-harvest' : ''} ${raised ? 'garden-slot-raised' : ''} ${openShopPing ? 'garden-slot-open-shop' : ''} ${growPop ? 'garden-slot-grow-pop' : ''}`}
+                    onClick={() => handleSlotClick(slotIndex)}
+                    aria-label={plant ? `Plant ${label}, ${isFullyGrown ? 'harvest' : 'growing'}` : 'Empty plot'}
+                  >
+                    {label ? (
+                      <>
+                        <span
+                          className="text-2xl sm:text-3xl font-bold tabular-nums"
+                          style={{ color: 'var(--col-text-heading)' }}
+                        >
+                          {label}
                         </span>
-                      )}
-                    </>
-                  ) : null}
-                </button>
+                        {isFullyGrown && (
+                          <span className="text-sm font-medium mt-1" style={{ color: 'var(--col-accent)' }}>
+                            Harvest
+                          </span>
+                        )}
+                      </>
+                    ) : null}
+                  </button>
+                  {showXpFloat && (
+                    <div className="xp-float" role="status" aria-live="polite">
+                      <span className="xp-float-inner">+{lastEarnedXp} XP</span>
+                    </div>
+                  )}
+                </div>
               )
             })}
           </div>
@@ -199,7 +234,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
         <button
           type="button"
           className="garden-shop-toggle"
-          onClick={() => setShopOpen((o) => !o)}
+          onClick={handleShopToggle}
           aria-expanded={shopOpen}
           aria-label={shopOpen ? 'Collapse shop' : 'Expand shop'}
         >
