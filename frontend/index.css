@@ -102,13 +102,23 @@ button, [role="button"], select, .modal-overlay {
   background-color: var(--col-bg-page);
 }
 
-/* Strip colors for daily cards (use variable-based class names) */
-.strip-checked {
-  background-color: var(--col-strip-checked);
-}
-.strip-unchecked {
-  background-color: var(--col-strip-unchecked);
-}
+/* Accent colours for daily cards (set of greens) */
+.accent-green-300 { background-color: var(--col-green-300); }
+.accent-green-400 { background-color: var(--col-green-400); }
+.accent-green-500 { background-color: var(--col-green-500); }
+.accent-green-600 { background-color: var(--col-green-600); }
+.accent-green-700 { background-color: var(--col-green-700); }
+.accent-green-800 { background-color: var(--col-green-800); }
+.accent-green-900 { background-color: var(--col-green-900); }
+
+/* Completed state: same hue, half saturation (hardcoded) */
+.accent-green-300.accent-completed { background-color: #a8e0ca; }
+.accent-green-400.accent-completed { background-color: #7ab896; }
+.accent-green-500.accent-completed { background-color: #5a9a78; }
+.accent-green-600.accent-completed { background-color: #4a7a65; }
+.accent-green-700.accent-completed { background-color: #3c6556; }
+.accent-green-800.accent-completed { background-color: #354d44; }
+.accent-green-900.accent-completed { background-color: #2e423a; }
 
 .btn-accent {
   background-color: var(--col-accent);
@@ -270,15 +280,27 @@ button, [role="button"], select, .modal-overlay {
   display: flex;
   gap: 0.25rem;
 }
-.star-rating button {
+.star-btn {
   padding: 0;
   background: none;
   border: none;
   cursor: pointer;
   color: var(--col-border);
 }
-.star-rating button.filled {
+.star-btn.filled {
   color: var(--col-rating);
+}
+
+@keyframes star-bob {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0px); }
+}
+.star-btn.star-bob {
+  animation: star-bob 700ms ease-in-out infinite;
+}
+.star-btn.star-pale {
+  color: var(--col-green-300);
 }
 
 /* Garden (The Garden) */
