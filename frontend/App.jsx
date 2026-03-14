@@ -27,7 +27,7 @@ function App() {
 
   const { garden, addGrowth, plantSeed, harvest, buyUpgrade } = useGarden()
 
-  const tasks = useTasks(addGrowth)
+  const tasks = useTasks(addGrowth, user?.user_id)
 
   const activeTodoCount = tasks.todos.filter((t) => !t.completed).length
   const incompleteDailyCount = tasks.dailies.filter((d) => !d.checked).length

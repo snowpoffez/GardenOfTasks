@@ -1,11 +1,11 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds, initialTodos } from '../constants/tasks'
 import { useHistory } from './useHistory'
 
-export function useTasks(addGrowth) {
+export function useTasks(addGrowth, userId) {
   const [dailies, setDailies] = useState(initialDailies)
   const [dailyOrderIds, setDailyOrderIds] = useState(initialDailyOrderIds)
-  const [todos, setTodos] = useState(initialTodos)
+  const [todos, setTodos] = useState([])
   const [todoTab, setTodoTab] = useState('active')
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
   const [editingTodoId, setEditingTodoId] = useState(null)
@@ -14,6 +14,26 @@ export function useTasks(addGrowth) {
   const { history, push: pushHistory, undo: undoHistory, canUndo } = useHistory()
 
   const push = useCallback(() => pushHistory(dailies, todos, dailyOrderIds), [pushHistory, dailies, todos, dailyOrderIds])
+
+  // Load tasks from backend on userId change (e.g. login/logout)
+  useEffect(() => {
+    if (!userId) return
+    fetch(`/api/tasks/${userId}`)
+      .then((res) => res.json())
+      .then((tasks) => {
+        setTodos(tasks.map(t => ({
+          id: 'todo-${t.id}',
+          title: t.task_name,
+          notes: t.description,
+          completed: t.status === 'completed',
+          rewardAmount: t.xp,
+          damageAmount: t.damageAmount,
+          dueDate: '', // Backend doesn't support due dates yet
+          checklistItems: [], // Backend doesn't support subtasks yet
+          accentColor: DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)],
+        })))
+      })
+  }, [userId])
 
   // --- Daily actions ---
 
