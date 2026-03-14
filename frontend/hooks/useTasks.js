@@ -1,9 +1,10 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { DAILY_ACCENT_COLORS, initialDailies, initialDailyOrderIds } from '../constants/tasks'
 
 export function useTasks(addGrowth, userId, onEarnXp) {
   const [dailies, setDailies] = useState([])
   const [dailyOrderIds, setDailyOrderIds] = useState([])
+  const checkedFromIndexRef = useRef({})
   const [todos, setTodos] = useState([])
   const [todoTab, setTodoTab] = useState('active')
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
@@ -64,15 +65,26 @@ export function useTasks(addGrowth, userId, onEarnXp) {
 
     const newChecked = daily ? !daily.checked : false
     setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
-    // Move completed daily to end of order so it reorders to bottom
     if (newChecked) {
       setDailyOrderIds((prev) => {
         const idx = prev.indexOf(dailyId)
         if (idx === -1) return [...prev, dailyId]
+        checkedFromIndexRef.current[dailyId] = idx
         const next = prev.filter((id) => id !== dailyId)
         next.push(dailyId)
         return next
       })
+    } else {
+      const fromIndex = checkedFromIndexRef.current[dailyId]
+      if (fromIndex != null) {
+        setDailyOrderIds((prev) => {
+          const without = prev.filter((id) => id !== dailyId)
+          const insertAt = Math.min(fromIndex, without.length)
+          without.splice(insertAt, 0, dailyId)
+          return without
+        })
+        delete checkedFromIndexRef.current[dailyId]
+      }
     }
 
     const dbId = dailyId.toString().replace('daily-', '')
