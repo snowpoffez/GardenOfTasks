@@ -1,0 +1,22 @@
+- Rename the stats after finishing this feature spec
+    - Strength
+        - Only strength-based skills can crit
+    - Constitution
+        - Will work against boss damage
+        - Weakens the effect of debuffs cast by bosses
+        - Health $= 50 + CON$
+    - Intelligence
+        - Cron won't give mana
+        - Consider nerfing to Max mana $= 30 + INT$
+    - Perception
+        - Nerf by removing drop cap
+- 1 point to each stat every...
+    - 2 levels up to level 50
+    - 5 levels up to level 100
+    - 10 levels beyond that
+- 1 point that can be allocated to any stat every...
+    - 1 level up to level 50
+    - 2 levels up to level 100
+    - 5 levels beyond that
+- Stats are rounded to one decimal place
+- Due to very strong max equipment, consider nerfing the effects of all stats in a way that affects higher level players much more than low level players

@@ -1,0 +1,2 @@
+- Rewards Gems or treasure chests
+- Take inspiration from Habitica's

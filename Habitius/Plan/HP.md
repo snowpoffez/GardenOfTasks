@@ -1,0 +1,17 @@
+- Displayed without decimal places, but if under 10 HP, show one decimal place
+- Damage taken/healed is displayed to two decimal places
+- HP is more transparent now, with CON directly affecting HP and not defense
+- Damage is taken from:
+    - Bad habits
+    - Incomplete dailies
+    - Damage taken $= \text{Difficulty} \times 0.9747^\text{Task Value}$
+        - Checklists on dailies reduces damage proportionately
+    - Boss quests
+- Damage is healed by:
+    - Heal skill
+    - Health potion
+        - Kept in inventory and obtainable from quests and treasure chests
+    - Health elixir
+        - Purchasable for $25 \text{GP}/15 \text{HP}$
+    - Levelling up
+        - Heals 30%

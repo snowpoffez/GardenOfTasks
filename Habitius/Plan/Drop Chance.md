@@ -1,0 +1,16 @@
+- Used for calculating chance of dropping a quest, pet food, or equipment fragments
+- Quest multiplier listed under *Quests*
+- Pet food has multiplier 0.2
+- Equipment fragments have multiplier 0.1 and drops between 1-3
+- Flat probabilities: 1 Gem with 1% chance and 5 Gems with 0.05% chance
+- To calculate the subtotal, multiply these numbers together:
+    - Task multiplier
+    - Streak bonus on Dailies: +0.01 for every completed day
+    - Perception: +0.01 per point
+    - Streak achievements: +0.005 per achievement
+    - Crit multiplier
+    - Checklist items complete: +0.5 per checklist item
+- Final probability = $\frac{3 \times \text{Item multiplier} \times \text{Bonus}}{\text{Bonus} + 1.5}$
+- Max one drop per task completion; roll simultaneously
+    - Eg. 0.6, 0.2, 0.01, 0.01 respectively; then there's 0.18 chance of nothing
+- To remove spam completing/uncompleting dailies for drops, keep track of whether a daily gave a drop today

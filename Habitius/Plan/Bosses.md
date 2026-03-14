@@ -1,0 +1,10 @@
+- HP ranges from 50 to 5000
+- DMG multiplier ranges from 0.5 to 5
+    - Multiplies damage taken from tasks
+- Some bosses can have...
+    - Flat damage every day
+    - Certain effects after HP is lowered to certain milestones
+        - Poison or burns
+            - Effect is weakened by CON
+        - Heals
+        - Challenges

@@ -1,0 +1,5 @@
+- Displayed without decimal places
+- Gains are to one decimal place
+- XP to level up $= 0.25x^2 + 10x + 130$, rounded to the nearest 10 XP
+    - Except for levels 1-5, which require 25, 50, 75, 100, and 150 XP respectively
+- XP earned $= 6 \times \text{Difficulty} \times 0.9747^{\text{Task Value}} \times \left(1 + \frac{\text{INT}}{40}\right)$
