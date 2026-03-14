@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
+import psycopg
 import os
 from dotenv import load_dotenv
 from database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks
@@ -10,7 +11,7 @@ from database import init_db, create_user, login_user, create_task, delete_task,
 DEBUG_MODE = True # False in production to ensure full functionality
 
 # Load local .env file (Vercel CLI also handles this automatically)
-load_dotenv()
+load_dotenv(".env.local")
 
 app = FastAPI()
 
@@ -104,7 +105,7 @@ async def germinate(request: AssignmentRequest):
             """
             # Using the 2026 standard Gemini 3 model
             response = client.models.generate_content(
-                model="gemini-3-flash-preview", 
+                model="gemini-3.1-flash-lite-preview", 
                 contents=prompt
             )
             return {"quests": response.text}
