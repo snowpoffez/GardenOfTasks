@@ -25,9 +25,8 @@ export function useTasks(addGrowth, userId) {
           id: 'todo-${t.id}',
           title: t.task_name,
           notes: t.description,
-          completed: t.status === 'completed',
+          completed: t.status == 'completed',
           rewardAmount: t.xp,
-          damageAmount: t.damageAmount,
           dueDate: '', // Backend doesn't support due dates yet
           checklistItems: [], // Backend doesn't support subtasks yet
           accentColor: DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)],
@@ -111,9 +110,29 @@ export function useTasks(addGrowth, userId) {
     setTodos((prev) => prev.map((t) => t.id === todoId ? { ...t, completed: !t.completed } : t))
   }, [push, todos, addGrowth])
 
-  const addTodo = useCallback((data) => {
+  const addTodo = useCallback(async (data) => {
     push()
     const accentColor = DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)]
+
+    // Save to database
+    if (userId) {
+      try {
+        await fetch('/api/tasks/createtask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            task_name: data.title || 'New task',
+            description: data.notes || '',
+            xp: (data.rewardAmount ?? 3) * 10,
+            status: 'todo'
+          })
+        })
+      } catch (err) {
+        console.error('Failed to save task:', err)
+      }
+    }
+
     setTodos((prev) => [...prev, {
       id: crypto.randomUUID(),
       title: data.title || 'New task',
