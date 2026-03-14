@@ -14,6 +14,8 @@ load_dotenv()
 
 app = FastAPI()
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 app.add_middleware(
     CORSMiddleware,
     # Allow local dev and your production URL
@@ -160,7 +162,7 @@ def get_user_tasks_route(user_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.get("/check-user/{username}")
+@app.get("/api/check-user/{username}")
 
 def check_username_exists(username: str):
     """
