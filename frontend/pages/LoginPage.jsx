@@ -1,17 +1,15 @@
 import { useState } from 'react'
 
-// Mock: replace with API call to check if account exists (e.g. GET /auth/check?identifier=...)
-function checkAccountExists(identifier) {
-  const trimmed = (identifier || '').trim().toLowerCase()
-  // Simulate existing accounts for demo
-  const existing = new Set(['test@test.com', 'user', 'demo'])
+// Mock: replace with API call to check if account exists (e.g. GET /auth/check?username=...)
+function checkAccountExists(username) {
+  const trimmed = (username || '').trim().toLowerCase()
+  const existing = new Set(['test', 'user', 'demo'])
   return existing.has(trimmed)
 }
 
 export default function LoginPage({ onLoginSuccess, onBack }) {
   const [step, setStep] = useState('identify') // 'identify' | 'password' | 'signup'
-  const [identifier, setIdentifier] = useState('')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isChecking, setIsChecking] = useState(false)
   const [error, setError] = useState('')
@@ -19,21 +17,15 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
   const handleIdentifySubmit = (e) => {
     e.preventDefault()
     setError('')
-    const value = identifier.trim()
+    const value = username.trim()
     if (!value) return
     setIsChecking(true)
-    // Simulate network delay; replace with: await api.get('/auth/check', { params: { identifier: value } })
+    // Simulate network delay; replace with: await api.get('/auth/check', { params: { username: value } })
     setTimeout(() => {
       setIsChecking(false)
       const exists = checkAccountExists(value)
-      if (exists) {
-        setStep('password')
-        setPassword('')
-      } else {
-        setStep('signup')
-        setEmail(value.includes('@') ? value : '')
-        setPassword('')
-      }
+      setStep(exists ? 'password' : 'signup')
+      setPassword('')
     }, 300)
   }
 
@@ -41,27 +33,24 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
     e.preventDefault()
     setError('')
     if (!password.trim()) return
-    // Mock login success; replace with: await api.post('/auth/login', { identifier, password })
+    // Mock login success; replace with: await api.post('/auth/login', { username, password })
     setTimeout(() => onLoginSuccess(), 200)
   }
 
   const handleSignupSubmit = (e) => {
     e.preventDefault()
     setError('')
-    const eTrim = email.trim()
-    const pTrim = password.trim()
-    if (!eTrim || !pTrim) {
-      setError('Email and password are required.')
+    if (!password.trim()) {
+      setError('Password is required.')
       return
     }
-    // Mock signup success; replace with: await api.post('/auth/signup', { email: eTrim, password: pTrim })
+    // Mock signup success; replace with: await api.post('/auth/signup', { username, password })
     setTimeout(() => onLoginSuccess(), 200)
   }
 
   const resetToIdentify = () => {
     setStep('identify')
-    setIdentifier('')
-    setEmail('')
+    setUsername('')
     setPassword('')
     setError('')
   }
@@ -97,14 +86,14 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
               Log in or sign up
             </h1>
             <p className="text-sm" style={{ color: 'var(--col-text-muted)' }}>
-              Enter your username or email to continue.
+              Enter your username to continue.
             </p>
             <input
               type="text"
-              autoComplete="username email"
-              placeholder="Username or email"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              autoComplete="username"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className={inputClass}
               style={inputStyle}
             />
@@ -120,7 +109,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
               Enter password
             </h1>
             <p className="text-sm" style={{ color: 'var(--col-text-muted)' }}>
-              Account for <strong>{identifier}</strong>
+              Account for <strong>{username}</strong>
             </p>
             <input
               type="password"
@@ -147,17 +136,8 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
               Create account
             </h1>
             <p className="text-sm" style={{ color: 'var(--col-text-muted)' }}>
-              No account found. Sign up with your email and a password.
+              No account found for <strong>{username}</strong>. Choose a password to sign up.
             </p>
-            <input
-              type="email"
-              autoComplete="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={inputClass}
-              style={inputStyle}
-            />
             <input
               type="password"
               autoComplete="new-password"
@@ -172,7 +152,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
               Sign up
             </button>
             <button type="button" onClick={resetToIdentify} className="text-sm font-medium" style={{ color: 'var(--col-text-muted)' }}>
-              Use a different email or username
+              Use a different username
             </button>
           </form>
         )}
