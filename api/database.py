@@ -70,7 +70,7 @@ def init_db():
                 # Player statistics
                 cur.execute("""
                     ALTER TABLE users 
-                    ADD COLUMN IF NOT EXISTS currency INTEGER DEFAULT 0,
+                    ADD COLUMN IF NOT EXISTS currency INTEGER DEFAULT 100,
                     ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0,
                     ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1;
                 """)
