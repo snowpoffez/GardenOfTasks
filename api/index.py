@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
+import psycopg
 import os
 from dotenv import load_dotenv
 from database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks
