@@ -34,6 +34,18 @@ def init_db():
                         status TEXT DEFAULT 'todo'
                     );
                 """)
+
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS dailies (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        task_name TEXT NOT NULL,
+                        description TEXT,
+                        xp INTEGER DEFAULT 0,
+                        status TEXT DEFAULT 'todo'
+                    );
+                """)
+
                 print("✅ Tables initialized.")
 
     except Exception as e:
@@ -231,4 +243,63 @@ def get_user_dailies(user_id: int):
                 return cur.fetchall()
     except Exception as e:
         print(f"Database error: {e}")
+        raise
+
+def update_daily_partial(daily_id: int, updates: dict):
+    """
+    Dynamically updates parts of a daily.
+    'updates' is a dict like {"task_name": "New Name", "xp": 20}
+    """
+    if not updates:
+        return {"message": "No updates provided"}
+
+    # Build the SET part of the SQL query dynamically
+    # e.g., "task_name = %s, xp = %s"
+    set_clause = ", ".join([f"{column} = %s" for column in updates.keys()])
+    values = list(updates.values())
+    values.append(daily_id)  # Add ID for the WHERE clause
+
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"UPDATE dailies SET {set_clause} WHERE id = %s",
+                    values
+                )
+                
+                if cur.rowcount == 0:
+                    raise ValueError("Daily not found")
+                
+                return {"success": True, "message": "Daily updated successfully"}
+    except Exception as e:
+        print(f"Update Error: {e}")
+        raise
+
+def update_task_partial(task_id: int, updates: dict):
+    """
+    Dynamically updates parts of a task.
+    'updates' is a dict like {"status": "completed", "xp": 50}
+    """
+    if not updates:
+        return {"message": "No updates provided"}
+
+    # Dynamically build the SET string: "column1 = %s, column2 = %s"
+    set_clause = ", ".join([f"{col} = %s" for col in updates.keys()])
+    values = list(updates.values())
+    values.append(task_id)
+
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"UPDATE tasks SET {set_clause} WHERE id = %s",
+                    values
+                )
+                
+                if cur.rowcount == 0:
+                    raise ValueError("Task not found")
+                
+                return {"success": True, "message": "Task updated successfully"}
+    except Exception as e:
+        print(f"Update Error: {e}")
         raise

@@ -5,7 +5,7 @@ from google import genai
 import psycopg
 import os
 from dotenv import load_dotenv
-from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks, create_daily, delete_daily, get_user_dailies
+from .database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks, create_daily, delete_daily, get_user_dailies, update_daily_partial, update_task_partial
 
 # Debug mode for saving API resources during development
 DEBUG_MODE = False # False in production to ensure full functionality
@@ -37,6 +37,18 @@ class TaskCreate(BaseModel):
     description: str | None = "No description provided"
     xp: int = 10
     status: str = "todo"
+
+class TaskUpdate(BaseModel):
+    task_name: str | None = None
+    description: str | None = None
+    xp: int | None = None
+    status: str | None = None
+
+class DailyUpdate(BaseModel):
+    task_name: str | None = None
+    description: str | None = None
+    xp: int | None = None
+    status: str | None = None
 
 class AssignmentRequest(BaseModel):
     text: str
@@ -227,17 +239,27 @@ def get_user_dailies_route(user_id: int):
         return get_user_dailies(user_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.patch("/api/dailies/{daily_id}")
+def patch_daily_route(daily_id: int, payload: DailyUpdate):
+    # Convert Pydantic model to a dict, excluding fields that are None
+    updates = payload.model_dump(exclude_none=True)
     
-@app.patch("/api/tasks/{task_id}")
-def update_task_route(task_id: int, payload: dict = Body(...)):
     try:
-        status = payload.get("status")
-        with psycopg.connect(DATABASE_URL) as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "UPDATE tasks SET status = %s WHERE id = %s",
-                    (status, task_id)
-                )
-        return {"success": True}
+        return update_daily_partial(daily_id, updates)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.patch("/api/tasks/{task_id}")
+def patch_task_route(task_id: int, payload: TaskUpdate):
+    # Filter out any fields that weren't sent (None)
+    updates = payload.model_dump(exclude_none=True)
+    
+    try:
+        return update_task_partial(task_id, updates)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
