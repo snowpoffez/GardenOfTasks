@@ -1,6 +1,0 @@
-- At the Cron time, screen will only show the list of incomplete dailies
-    - Include the list that says "Record Yesterday's Activity" with a button that says "Start My Day"
-    - User has exactly one chance to change Cron time
-        - Defaults to midnight
-    - Cron doesn't run if the player does not press "Start My Day"
-    - Cron does not give mana

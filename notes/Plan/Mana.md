@@ -1,6 +1,0 @@
-- Displayed without decimal places
-- Dailies give max(1 MP, 1% of max mana)
-    - Incomplete dailies lose max(0.5 MP, 0.5% of max mana)
-- Habits give max(0.25 MP, 0.25% of max mana)
-- Cron doesn't give mana
-- Mana potions can be dropped from quests and treasure chests

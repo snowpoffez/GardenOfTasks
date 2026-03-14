@@ -1,5 +1,0 @@
-- Luxury currency, not pay to win
-- Approximately 1 Gem is worth 100 Gold
-    - Beginners will definitely have more
-- Sources include certain quests and achievements
-    - Finishing tasks could award 1 Gem with 1% chance and 5 Gems with 0.05% chance

@@ -1,3 +1,0 @@
-- Displayed with one decimal place, but if under 10 GP, show two decimal places
-- Gains are to two decimal places
-- GP earned $= \text{Difficulty} \times 0.9747^{\text{Task Value}} \times \left(1 + \frac{\text{PER}}{50}\right) \times \left(1 + \frac{\text{Streak}}{100}\right)$
