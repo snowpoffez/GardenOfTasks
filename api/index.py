@@ -59,12 +59,6 @@ class XPIncrement(BaseModel):
 class AssignmentRequest(BaseModel):
     text: str
 
-class CurrencyRequest(BaseModel):
-    amount: int
-
-class XPIncrement(BaseModel):
-    xp_gain: int
-
 # Initialize database on startup
 init_db()
 
