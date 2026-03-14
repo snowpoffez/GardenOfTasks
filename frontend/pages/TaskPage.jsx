@@ -9,7 +9,7 @@ import DailyFormModal from '../components/modals/DailyFormModal'
 import GenerateAITaskModal from '../components/modals/GenerateAITaskModal'
 
 const XP_FLOAT_MS = 1500
-const DAILY_SLIDE_MS = 750
+const DAILY_SLIDE_MS = 2000
 
 function moveIndex(arr, fromIndex, toIndex) {
   if (fromIndex === toIndex) return arr
