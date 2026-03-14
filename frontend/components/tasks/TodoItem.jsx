@@ -1,10 +1,19 @@
+import { useState, useEffect } from 'react'
 import { Check, Calendar } from '@phosphor-icons/react'
 
 export default function TodoItem({ todo, onToggle, onEdit }) {
   const accentClass = `accent-${todo.accentColor || 'green-500'}`
+  const [justCompleted, setJustCompleted] = useState(false)
+  useEffect(() => {
+    if (todo.completed) {
+      setJustCompleted(true)
+      const t = setTimeout(() => setJustCompleted(false), 500)
+      return () => clearTimeout(t)
+    }
+  }, [todo.completed])
   return (
     <div
-      className={`task-card flex rounded-lg overflow-hidden min-h-[72px] ${todo.completed ? 'task-card-completed' : ''}`}
+      className={`task-card task-card-breathe flex rounded-lg overflow-hidden min-h-[72px] ${todo.completed ? 'task-card-completed' : ''} ${justCompleted ? 'task-card-spell' : ''}`}
       style={{ backgroundColor: 'var(--col-bg-card)' }}
     >
       <div className={`w-12 shrink-0 ${accentClass} flex items-center justify-center py-3 ${todo.completed ? 'accent-completed' : ''}`}>

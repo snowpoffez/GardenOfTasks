@@ -234,7 +234,8 @@ export default function TaskPage({
                         if (Number.isNaN(from)) return
                         onReorderDailies?.(displayedDailies.map((x) => x.id), from, index)
                       }}
-                      className="cursor-grab active:cursor-grabbing"
+                      className="task-card-enter cursor-grab active:cursor-grabbing"
+                      style={{ animationDelay: `${index * 45}ms` }}
                     >
                       <DailyCard daily={d} onToggle={handleDailyToggle} onEdit={onOpenEditDaily} />
                     </div>
@@ -295,7 +296,8 @@ export default function TaskPage({
                           const otherIds = todos.map((x) => x.id).filter((id) => !displayedIds.includes(id))
                           onReorderTodos([...newDisplayedIds, ...otherIds])
                         }}
-                        className="cursor-grab active:cursor-grabbing"
+                        className="task-card-enter cursor-grab active:cursor-grabbing"
+                        style={{ animationDelay: `${index * 45}ms` }}
                       >
                         <TodoItem todo={t} onToggle={handleTodoToggle} onEdit={onOpenEditTodo} />
                       </div>
