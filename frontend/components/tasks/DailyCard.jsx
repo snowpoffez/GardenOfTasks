@@ -4,8 +4,8 @@ export default function DailyCard({ daily, onToggle, onEdit }) {
   const accentClass = `accent-${daily.accentColor || 'green-500'}`
   return (
     <div
-      className="flex rounded-lg shadow-md overflow-hidden min-h-[72px]"
-      style={{ backgroundColor: 'var(--col-bg-card)', borderWidth: '1px', borderColor: 'var(--col-border)' }}
+      className={`task-card flex rounded-lg overflow-hidden min-h-[72px] ${daily.checked ? 'task-card-completed' : ''}`}
+      style={{ backgroundColor: 'var(--col-bg-card)' }}
     >
       <div className={`w-12 shrink-0 ${accentClass} flex items-center justify-center py-3 ${daily.checked ? 'accent-completed' : ''}`}>
         <button

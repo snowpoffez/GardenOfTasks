@@ -103,10 +103,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   }, [lastGrownSlots, onClearGrownSlots, onClearLastEarnedXp])
 
   return (
-    <div
-      className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6 overflow-auto relative"
-      style={{ backgroundColor: 'var(--col-bg-page)' }}
-    >
+    <div className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6 overflow-auto relative">
       {showDeselectOverlay && (
         <div className="garden-full-overlay" onClick={handleDeselect} aria-hidden />
       )}
@@ -144,7 +141,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
                           {label}
                         </span>
                         {isFullyGrown && (
-                          <span className="text-sm font-medium mt-1" style={{ color: 'var(--col-accent)' }}>
+                          <span className="text-sm font-medium mt-1 harvest-label">
                             Harvest
                           </span>
                         )}

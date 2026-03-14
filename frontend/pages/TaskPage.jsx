@@ -183,7 +183,7 @@ export default function TaskPage({
 
   return (
     <>
-      <div className="flex-1 min-h-0 flex flex-col" style={{ backgroundColor: 'var(--col-bg-page)' }}>
+      <div className="flex-1 min-h-0 flex flex-col">
         <div className="flex justify-end gap-2 pt-5 pb-2 pr-[5rem]">
           <button
             type="button"
