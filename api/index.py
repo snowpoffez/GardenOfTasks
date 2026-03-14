@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
+import psycopg
 import os
 from dotenv import load_dotenv
 from database import init_db, create_user, login_user, create_task, delete_task, get_user_tasks
@@ -13,6 +14,8 @@ DEBUG_MODE = True # False in production to ensure full functionality
 load_dotenv(".env.local")
 
 app = FastAPI()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 app.add_middleware(
     CORSMiddleware,
@@ -159,3 +162,27 @@ def get_user_tasks_route(user_id: int):
         return get_user_tasks(user_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/api/check-user/{username}")
+
+def check_username_exists(username: str):
+    """
+    Checks if a username exists in the users table.
+    Returns a dict with the existence status.
+    """
+    try:
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                # Standard cursor returns results as tuples
+                cur.execute(
+                    "SELECT id FROM users WHERE username = %s",
+                    (username,)
+                )
+                user = cur.fetchone() # This will be (id,) or None
+                
+                # Check if user is not None to confirm existence
+                return {"exists": user is not None}
+
+    except Exception as e:
+        print(f"Database error: {e}")
+        raise

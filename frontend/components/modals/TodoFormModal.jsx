@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash, CaretDown, Sparkle } from '@phosphor-icons/react'
+import { Plus, Trash, CaretDown } from '@phosphor-icons/react'
 import StarRating from '../StarRating'
 
 export default function TodoFormModal({ mode = 'add', initialData, onSave, onClose, onDelete }) {
@@ -122,14 +122,6 @@ export default function TodoFormModal({ mode = 'add', initialData, onSave, onClo
                     style={{ color: 'var(--col-text-muted)' }}
                   >
                     <Plus size={14} /> New subtask
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => addSubtask('67')}
-                    className="text-sm flex items-center gap-1"
-                    style={{ color: 'var(--col-accent)' }}
-                  >
-                    <Sparkle size={14} /> Generate with AI
                   </button>
                 </div>
               </div>
