@@ -48,6 +48,23 @@ def init_db():
 
                 print("✅ Tables initialized.")
 
+                # 3. Dailies table
+                cur.execute("""
+                    CREATE TABLE IF NOT EXISTS dailies (
+                        id SERIAL PRIMARY KEY,
+                        user_id INTEGER NOT NULL,
+                        task_name TEXT NOT NULL,
+                        description TEXT,
+                        xp INTEGER DEFAULT 0,
+                        status TEXT DEFAULT 'todo',
+                        checked BOOLEAN DEFAULT FALSE,
+                        accent_color TEXT,
+                        repeat_interval TEXT DEFAULT 'Daily',
+                        repeat_every INTEGER DEFAULT 1,
+                        repeat_unit TEXT DEFAULT 'day',
+                        due_date TEXT
+                    );
+                """)
     except Exception as e:
         print(f"❌ Initialization failed: {e}")
 

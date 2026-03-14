@@ -16,6 +16,7 @@ export default defineConfig({
       '/api/login': 'http://localhost:8000',
       '/api/register': 'http://localhost:8000',
       '/api/tasks': 'http://localhost:8000',
+      '/api/dailies': 'http://localhost:8000',
       '/api/health': 'http://localhost:8000',
       '/api/check-user': 'http://localhost:8000',
     }
