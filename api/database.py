@@ -2,7 +2,7 @@ import os
 import psycopg
 from psycopg.rows import dict_row
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("POSTGRES_URL") or os.environ.get("DATABASE_URL")
 
 def init_db():
     """Sets up Users and Tasks without formal constraints."""

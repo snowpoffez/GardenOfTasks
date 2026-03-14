@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Body
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from google import genai
 import os
@@ -12,6 +13,17 @@ DEBUG_MODE = True # False in production to ensure full functionality
 load_dotenv()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    # Allow local dev and your production URL
+    allow_origins=[
+        "http://localhost:5173", 
+        "https://garden-of-tasks.vercel.app"
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize Gemini Client using api key
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
