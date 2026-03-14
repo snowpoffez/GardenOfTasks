@@ -1,2 +1,0 @@
-- Chance is $0.04 \left(1 + \frac{\text{STR}}{100}\right)$
-- Multiplier is $1.5 + 0.1 \sqrt{\text{STR}}$

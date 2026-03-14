@@ -1,3 +1,0 @@
-- No hatching potions/eggs
-    - Maybe make some egg type pet that hatches after fed enough
-- Has rarities and elements
