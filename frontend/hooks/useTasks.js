@@ -105,10 +105,23 @@ export function useTasks(addGrowth, userId) {
 
   const toggleTodo = useCallback((todoId) => {
     const todo = todos.find((t) => t.id === todoId)
-    if (todo && !todo.completed) addGrowth(2)
+    if (!todo) return
+    if (!todo.completed) addGrowth(2)
     push()
-    setTodos((prev) => prev.map((t) => t.id === todoId ? { ...t, completed: !t.completed } : t))
-  }, [push, todos, addGrowth])
+
+    const newCompleted = !todo.completed
+    setTodos((prev) => prev.map((t) => t.id === todoId ? { ...t, completed: newCompleted } : t))
+
+    // Save to database — strip the 'todo-' prefix to get the real DB id
+    const dbId = todoId.toString().replace('todo-', '')
+    if (userId && !isNaN(dbId)) {
+      fetch(`/api/tasks/${dbId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newCompleted ? 'completed' : 'todo' })
+      }).catch(err => console.error('Failed to update task:', err))
+    }
+  }, [push, todos, addGrowth, userId])
 
   const addTodo = useCallback(async (data) => {
     push()

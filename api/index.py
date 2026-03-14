@@ -227,3 +227,17 @@ def get_user_dailies_route(user_id: int):
         return get_user_dailies(user_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
+    
+@app.patch("/api/tasks/{task_id}")
+def update_task_route(task_id: int, payload: dict = Body(...)):
+    try:
+        status = payload.get("status")
+        with psycopg.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE tasks SET status = %s WHERE id = %s",
+                    (status, task_id)
+                )
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
