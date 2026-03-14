@@ -74,8 +74,18 @@ async def germinate(request: AssignmentRequest):
     else:
         try:
             prompt = f"""
-            Break the following assignment into any number of nature-themed tasks that you see fit: "{request.text}"
+            You are a helpful study assistant that breaks assignments into small, actionable steps.
 
+            Convert this assignment into a list of clear tasks: "{request.text}"
+
+            Rules:
+            - Each task must be a single, concrete action a student can complete in one sitting (e.g. "Write 3 bullet points summarizing Chapter 2", not "Research the topic")
+            - Tasks should build on each other in logical order — earlier tasks feed into later ones
+            - Task names should be short, nature-themed, and energetic (e.g. "Plant the Seed", "Clear the Path")
+            - Descriptions must be specific and tell the student exactly what to do and what the result looks like when done
+            - XP should reflect effort: 10-30 for quick tasks (under 10 min), 40-60 for medium (10-30 min), 70-100 for hard (30+ min)
+            - Aim for as many tasks as you see fit depending on the complexity of the assignment, but make sure to always follow the principle of making it clear and actionable for the student.
+            
             You must return the data strictly as a JSON list of objects.
 
             Do not include any conversational text, markdown formatting, or backticks.
