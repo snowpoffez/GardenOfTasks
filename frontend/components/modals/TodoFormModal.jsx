@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash, CaretDown } from '@phosphor-icons/react'
+import { PlusIcon, TrashIcon, CaretDownIcon } from '@phosphor-icons/react'
 import StarRating from '../StarRating'
 
 export default function TodoFormModal({ mode = 'add', initialData, onSave, onClose, onDelete }) {
@@ -100,7 +100,7 @@ export default function TodoFormModal({ mode = 'add', initialData, onSave, onClo
               style={{ color: 'var(--col-text-body)' }}
             >
               Subtasks
-              <CaretDown size={16} className={subtasksOpen ? 'rotate-180' : ''} />
+              <CaretDownIcon size={16} className={subtasksOpen ? 'rotate-180' : ''} />
             </button>
             {subtasksOpen && (
               <div className="mt-2">
@@ -121,7 +121,7 @@ export default function TodoFormModal({ mode = 'add', initialData, onSave, onClo
                     className="text-sm flex items-center gap-1"
                     style={{ color: 'var(--col-text-muted)' }}
                   >
-                    <Plus size={14} /> New subtask
+                    <PlusIcon size={14} /> New subtask
                   </button>
                 </div>
               </div>
@@ -134,7 +134,7 @@ export default function TodoFormModal({ mode = 'add', initialData, onSave, onClo
                 className="modal-danger-btn"
                 onClick={() => { onDelete(); onClose() }}
               >
-                <Trash size={18} weight="regular" />
+                <TrashIcon size={18} weight="regular" />
                 Delete To Do
               </button>
             </div>

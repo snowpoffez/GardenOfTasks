@@ -1,4 +1,4 @@
-import { Gear, Bell, Palette, Calendar, Shield } from '@phosphor-icons/react'
+import { GearIcon, BellIcon, PaletteIcon, CalendarIcon, ShieldIcon } from '@phosphor-icons/react'
 
 function SettingsSection({ icon: Icon, title, children }) {
   return (
@@ -54,7 +54,7 @@ export default function SettingsPage() {
           Settings
         </h1>
 
-        <SettingsSection icon={Bell} title="Notifications">
+        <SettingsSection icon={BellIcon} title="Notifications">
           <SettingsRow
             isFirst
             label="Daily reminder"
@@ -78,7 +78,7 @@ export default function SettingsPage() {
           />
         </SettingsSection>
 
-        <SettingsSection icon={Palette} title="Appearance">
+        <SettingsSection icon={PaletteIcon} title="Appearance">
           <SettingsRow
             isFirst
             label="Theme"
@@ -91,7 +91,7 @@ export default function SettingsPage() {
           />
         </SettingsSection>
 
-        <SettingsSection icon={Calendar} title="Preferences">
+        <SettingsSection icon={CalendarIcon} title="Preferences">
           <SettingsRow
             isFirst
             label="Week starts on"
@@ -113,7 +113,7 @@ export default function SettingsPage() {
           />
         </SettingsSection>
 
-        <SettingsSection icon={Shield} title="Account">
+        <SettingsSection icon={ShieldIcon} title="Account">
           <SettingsRow
             isFirst
             label="Change password"

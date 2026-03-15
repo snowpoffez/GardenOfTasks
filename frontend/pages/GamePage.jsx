@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { CaretDown, CaretRight, Package, TrendUp } from '@phosphor-icons/react'
+import { CaretDownIcon, CaretRightIcon, PackageIcon, TrendUpIcon } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
 
 const QUEUE_GLOW_COUNT = 3
@@ -174,9 +174,9 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
             aria-expanded={upgradesOpen}
             aria-label={upgradesOpen ? 'Collapse upgrades' : 'Expand upgrades'}
           >
-            <TrendUp size={24} weight="bold" />
+            <TrendUpIcon size={24} weight="bold" />
             <span className="garden-upgrades-toggle-label">Upgrades</span>
-            {upgradesOpen ? <CaretDown size={20} /> : <CaretRight size={20} />}
+            {upgradesOpen ? <CaretDownIcon size={20} /> : <CaretRightIcon size={20} />}
           </button>
           {upgradesOpen && (
             <div className="garden-upgrades-box">
@@ -232,9 +232,9 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
             aria-expanded={shopOpen}
             aria-label={shopOpen ? 'Collapse shop' : 'Expand shop'}
           >
-            <Package size={24} weight="bold" />
+            <PackageIcon size={24} weight="bold" />
             <span className="garden-shop-toggle-label">Shop</span>
-            {shopOpen ? <CaretDown size={20} /> : <CaretRight size={20} />}
+            {shopOpen ? <CaretDownIcon size={20} /> : <CaretRightIcon size={20} />}
           </button>
           {shopOpen && (
             <div className="garden-shop-box">

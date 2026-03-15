@@ -1,4 +1,4 @@
-import { UserCircle, Leaf, CurrencyDollar, Star } from '@phosphor-icons/react'
+import { UserCircleIcon, LeafIcon, CurrencyDollarIcon, StarIcon } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
 
 export default function ProfilePage({ user, stats }) {
@@ -24,7 +24,7 @@ export default function ProfilePage({ user, stats }) {
               className="w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0"
               style={{ backgroundColor: 'var(--col-green-200)' }}
             >
-              <UserCircle size={48} style={{ color: 'var(--col-green-700)' }} />
+              <UserCircleIcon size={48} style={{ color: 'var(--col-green-700)' }} />
             </div>
             <div className="flex-1 text-center sm:text-left">
               <h1
@@ -51,7 +51,7 @@ export default function ProfilePage({ user, stats }) {
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: 'var(--col-green-200)' }}
               >
-                <Leaf size={22} style={{ color: 'var(--col-green-700)' }} />
+                <LeafIcon size={22} style={{ color: 'var(--col-green-700)' }} />
               </div>
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--col-text-muted)' }}>
@@ -73,7 +73,7 @@ export default function ProfilePage({ user, stats }) {
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: 'var(--col-green-200)' }}
               >
-                <Star size={22} style={{ color: 'var(--col-green-700)' }} />
+                <StarIcon size={22} style={{ color: 'var(--col-green-700)' }} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--col-text-muted)' }}>
@@ -107,7 +107,7 @@ export default function ProfilePage({ user, stats }) {
                 className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: 'var(--col-green-200)' }}
               >
-                <CurrencyDollar size={22} style={{ color: 'var(--col-green-700)' }} />
+                <CurrencyDollarIcon size={22} style={{ color: 'var(--col-green-700)' }} />
               </div>
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide" style={{ color: 'var(--col-text-muted)' }}>

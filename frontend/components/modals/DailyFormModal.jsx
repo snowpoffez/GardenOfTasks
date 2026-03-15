@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Trash } from '@phosphor-icons/react'
+import { TrashIcon } from '@phosphor-icons/react'
 import StarRating from '../StarRating'
 
 const REPEAT_OPTIONS = ['Daily', 'Weekly', 'Monthly', 'Yearly']
@@ -120,7 +120,7 @@ export default function DailyFormModal({ mode = 'add', initialData, onSave, onCl
                 className="modal-danger-btn"
                 onClick={() => { onDelete(); onClose() }}
               >
-                <Trash size={18} weight="regular" />
+                <TrashIcon size={18} weight="regular" />
                 Delete Daily
               </button>
             </div>

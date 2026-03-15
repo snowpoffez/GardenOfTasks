@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { User, CurrencyDollar, CaretDown, UserCircle, Gear, SignOut } from '@phosphor-icons/react'
+import { UserIcon, CurrencyDollarIcon, CaretDownIcon, UserCircleIcon, GearIcon, SignOutIcon } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
 
 const PAGES = {
@@ -42,7 +42,15 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
     <header className="flex flex-col">
       <div className="navbar flex items-center justify-between px-6 py-6">
         <div className="flex items-center gap-8">
-          <span className="navbar-brand whitespace-nowrap">&gt; Garden of Tasks</span>
+          <span className="navbar-brand flex items-center gap-2.5 whitespace-nowrap">
+            <span className="navbar-logo" aria-hidden>
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 6c-4 4-8 8-8 14 0 4 3 6 6 6 2 0 4-1 6-3 2 2 4 3 6 3 3 0 6-2 6-6 0-6-4-10-8-14z" fill="currentColor" opacity="0.92"/>
+                <path d="M16 6c4 4 8 8 8 14 0 4-3 6-6 6-2 0-4-1-6-3-2 2-4 3-6 3-3 0-6-2-6-6 0-6 4-10 8-14z" fill="currentColor" opacity="0.85"/>
+              </svg>
+            </span>
+            Garden of Tasks
+          </span>
           <nav className="navbar-nav">
             <button
               type="button"
@@ -76,7 +84,7 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
             </span>
           </span>
           <span className="navbar-gold">
-            <CurrencyDollar size={18} weight="bold" />
+            <CurrencyDollarIcon size={18} weight="bold" />
             {gold != null ? formatCoins(gold, 3) : '—'}
           </span>
           <div className="relative" ref={dropdownRef}>
@@ -87,8 +95,8 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
               aria-expanded={dropdownOpen}
               onClick={() => setDropdownOpen((o) => !o)}
             >
-              <User size={20} />
-              <CaretDown size={14} className="ml-0.5 opacity-80" />
+              <UserIcon size={20} />
+              <CaretDownIcon size={14} className="ml-0.5 opacity-80" />
             </button>
             {dropdownOpen && (
               <div className="navbar-dropdown">
@@ -97,7 +105,7 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
                   className="navbar-dropdown-item"
                   onClick={() => handleNav(PAGES.profile)}
                 >
-                  <UserCircle size={18} />
+                  <UserCircleIcon size={18} />
                   Profile
                 </button>
                 <button
@@ -105,7 +113,7 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
                   className="navbar-dropdown-item"
                   onClick={() => handleNav(PAGES.settings)}
                 >
-                  <Gear size={18} />
+                  <GearIcon size={18} />
                   Settings
                 </button>
                 <hr className="navbar-dropdown-divider" />
@@ -114,7 +122,7 @@ export default function Header({ user, stats, currentPage, onNavigate, onLogout 
                   className="navbar-dropdown-item navbar-dropdown-item-danger"
                   onClick={handleLogout}
                 >
-                  <SignOut size={18} />
+                  <SignOutIcon size={18} />
                   Log out
                 </button>
               </div>

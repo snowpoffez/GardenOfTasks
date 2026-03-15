@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Plus } from '@phosphor-icons/react'
+import { PlusIcon } from '@phosphor-icons/react'
 import DailyCard from '../components/tasks/DailyCard'
 import TodoItem from '../components/tasks/TodoItem'
 import AddTaskPickModal from '../components/modals/AddTaskPickModal'
@@ -216,7 +216,7 @@ export default function TaskPage({
             onClick={onOpenAddTask}
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium shadow btn-accent"
           >
-            <Plus size={20} weight="bold" />
+            <PlusIcon size={20} weight="bold" />
             Add Task
           </button>
         </div>

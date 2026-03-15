@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Check, Flame, Calendar } from '@phosphor-icons/react'
+import { CheckIcon, FlameIcon, CalendarIcon } from '@phosphor-icons/react'
 
 export default function DailyCard({ daily, onToggle, onEdit }) {
   const accentClass = `accent-${daily.accentColor || 'green-500'}`
@@ -24,7 +24,7 @@ export default function DailyCard({ daily, onToggle, onEdit }) {
           style={daily.checked ? { backgroundColor: 'var(--col-bg-card)', color: 'var(--col-text-heading)' } : {}}
           aria-label={daily.checked ? 'Checked' : 'Unchecked'}
         >
-          {daily.checked ? <Check size={14} weight="bold" /> : null}
+          {daily.checked ? <CheckIcon size={14} weight="bold" /> : null}
         </button>
       </div>
       <div
@@ -48,13 +48,13 @@ export default function DailyCard({ daily, onToggle, onEdit }) {
           <span className="flex items-center gap-1 min-w-0">
             {daily.dueDate?.trim() && (
               <>
-                <Calendar size={12} className="shrink-0" aria-hidden />
+                <CalendarIcon size={12} className="shrink-0" aria-hidden />
                 <span className="truncate">Due {daily.dueDate.trim()}</span>
               </>
             )}
           </span>
           <span className="flex items-center gap-1 shrink-0">
-            <Flame size={12} aria-hidden />
+            <FlameIcon size={12} aria-hidden />
             <span>{daily.count}</span>
           </span>
         </div>

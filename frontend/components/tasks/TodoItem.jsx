@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Check, Calendar } from '@phosphor-icons/react'
+import { CheckIcon, CalendarIcon } from '@phosphor-icons/react'
 
 export default function TodoItem({ todo, onToggle, onEdit }) {
   const accentClass = `accent-${todo.accentColor || 'green-500'}`
@@ -24,7 +24,7 @@ export default function TodoItem({ todo, onToggle, onEdit }) {
           style={todo.completed ? { backgroundColor: 'var(--col-bg-card)', color: 'var(--col-text-heading)' } : {}}
           aria-label={todo.completed ? 'Completed' : 'Mark complete'}
         >
-          {todo.completed ? <Check size={14} weight="bold" /> : null}
+          {todo.completed ? <CheckIcon size={14} weight="bold" /> : null}
         </button>
       </div>
       <div
@@ -49,7 +49,7 @@ export default function TodoItem({ todo, onToggle, onEdit }) {
         </div>
         {todo.dueDate?.trim() && (
           <div className="flex items-center gap-1 mt-1.5 text-xs shrink-0" style={{ color: 'var(--col-text-muted)' }}>
-            <Calendar size={12} className="shrink-0" aria-hidden />
+            <CalendarIcon size={12} className="shrink-0" aria-hidden />
             <span className="truncate">Due {todo.dueDate.trim()}</span>
           </div>
         )}

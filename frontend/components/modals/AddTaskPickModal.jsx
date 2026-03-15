@@ -1,4 +1,4 @@
-import { Sparkle } from '@phosphor-icons/react'
+import { SparkleIcon } from '@phosphor-icons/react'
 
 export default function AddTaskPickModal({ onPickDaily, onPickTodo, onPickGenerateAI, onClose }) {
   return (
@@ -27,7 +27,7 @@ export default function AddTaskPickModal({ onPickDaily, onPickTodo, onPickGenera
             className="w-full py-3 px-4 rounded-lg text-left font-medium flex items-center gap-2 btn-accent"
             onClick={onPickGenerateAI}
           >
-            <Sparkle size={18} weight="fill" />
+            <SparkleIcon size={18} weight="fill" />
             Generate with AI
           </button>
         </div>

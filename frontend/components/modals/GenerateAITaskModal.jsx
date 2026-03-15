@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Sparkle, FilePdf, X } from '@phosphor-icons/react'
+import { SparkleIcon, FilePdfIcon, XIcon } from '@phosphor-icons/react'
 
 // Call the backend germinate API to generate tasks
 // Falls back to a fast mock response when the backend is not reachable or times out.
@@ -122,7 +122,7 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
       >
         <div className="modal-header flex items-center justify-between">
           <span className="font-semibold flex items-center gap-2">
-            <Sparkle size={20} weight="fill" style={{ color: 'var(--col-accent)' }} />
+            <SparkleIcon size={20} weight="fill" style={{ color: 'var(--col-accent)' }} />
             Generate Tasks with AI
           </span>
           <button type="button" onClick={onClose} className="text-sm font-medium opacity-90 hover:opacity-100">
@@ -136,7 +136,7 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
 
           <div className="modal-field shrink-0">
             <label className="flex items-center gap-2">
-              <FilePdf size={18} />
+              <FilePdfIcon size={18} />
               Upload PDF (optional)
             </label>
             <input
@@ -150,7 +150,7 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
               <div className="mt-2 flex items-center gap-2 text-sm">
                 <span className="truncate flex-1" title={pdfFile.name}>{pdfFile.name}</span>
                 <button type="button" onClick={removePdf} className="p-1 rounded hover:bg-black/10" aria-label="Remove PDF">
-                  <X size={16} />
+                  <XIcon size={16} />
                 </button>
               </div>
             )}
@@ -181,7 +181,7 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
                 <>Generating Tasks…</>
               ) : (
                 <>
-                  <Sparkle size={16} weight="fill" />
+                  <SparkleIcon size={16} weight="fill" />
                   Generate Tasks
                 </>
               )}

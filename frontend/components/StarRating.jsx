@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Star } from '@phosphor-icons/react'
+import { StarIcon } from '@phosphor-icons/react'
 
 export default function StarRating({ value, onChange, max = 5 }) {
   const [hovered, setHovered] = useState(null)
@@ -32,7 +32,7 @@ export default function StarRating({ value, onChange, max = 5 }) {
             style={isHovering ? { animationDelay: `${i * 55}ms` } : undefined}
             aria-label={`${i + 1} of ${max}`}
           >
-            <Star size={24} weight={weight} />
+            <StarIcon size={24} weight={weight} />
           </button>
         )
       })}
