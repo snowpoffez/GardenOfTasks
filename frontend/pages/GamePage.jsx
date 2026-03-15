@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { CaretDownIcon, CaretRightIcon, PackageIcon, TrendUpIcon } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
+import GrayScrollbar from '../components/GrayScrollbar'
 
 const QUEUE_GLOW_COUNT = 3
 const XP_FLOAT_MS = 1500
@@ -105,7 +106,9 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   }, [lastGrownSlots, onClearGrownSlots, onClearLastEarnedXp])
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6 overflow-auto relative">
+    <div className="flex-1 min-h-0 flex flex-col relative">
+      <GrayScrollbar>
+    <div className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6">
       {showDeselectOverlay && (
         <div className="garden-full-overlay" onClick={handleDeselect} aria-hidden />
       )}
@@ -294,6 +297,8 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
           </div>
         </div>
       )}
+    </div>
+    </GrayScrollbar>
     </div>
   )
 }

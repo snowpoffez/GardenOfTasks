@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { SparkleIcon, FilePdfIcon, XIcon } from '@phosphor-icons/react'
+import GrayScrollbar from '../GrayScrollbar'
 
 // Call the backend germinate API to generate tasks
 // Falls back to a fast mock response when the backend is not reachable or times out.
@@ -129,7 +130,9 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
             Cancel
           </button>
         </div>
-        <div className="modal-body flex flex-col gap-4 flex-1 min-h-0 overflow-auto">
+        <div className="modal-body flex flex-col flex-1 min-h-0">
+          <GrayScrollbar>
+          <div className="flex flex-col gap-4">
           <p className="text-sm opacity-90 shrink-0">
             Describe your assignment and our AI will break it down into multiple nature-themed tasks with XP rewards.
           </p>
@@ -187,6 +190,8 @@ export default function GenerateAITaskModal({ onGenerated, onClose }) {
               )}
             </button>
           </div>
+          </div>
+          </GrayScrollbar>
         </div>
       </div>
     </div>

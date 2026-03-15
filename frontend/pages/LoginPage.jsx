@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { login, register, checkUser } from '../api/auth'
+import GrayScrollbar from '../components/GrayScrollbar'
 
 export default function LoginPage({ onLoginSuccess, onBack }) {
   const [step, setStep] = useState('identify') // 'identify' | 'password' | 'signup'
@@ -76,9 +77,10 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
 
   return (
     <div
-      className="flex-1 flex flex-col items-center justify-center p-8 min-h-0 overflow-auto"
+      className="flex-1 min-h-0 flex flex-col"
       style={{ backgroundColor: 'var(--col-bg-page)' }}
     >
+      <GrayScrollbar className="flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm flex flex-col gap-4">
         {onBack && (
           <button
@@ -168,6 +170,7 @@ export default function LoginPage({ onLoginSuccess, onBack }) {
           </form>
         )}
       </div>
+      </GrayScrollbar>
     </div>
   )
 }

@@ -129,6 +129,22 @@ button, [role="button"], select, .modal-overlay {
   50% { opacity: 1; transform: scale(1.2); }
 }
 
+/* Gray scrollbars (react-scrollbars-custom) - https://xobotyi.github.io/react-scrollbars-custom/ */
+.scrollbars-gray .ScrollbarsCustom-Track {
+  background: var(--col-gray-200) !important;
+  border-radius: 4px;
+}
+.scrollbars-gray .ScrollbarsCustom-Thumb {
+  background: var(--col-gray-500) !important;
+  border-radius: 4px;
+}
+.scrollbars-gray .ScrollbarsCustom-Thumb:hover {
+  background: var(--col-gray-600) !important;
+}
+.scrollbars-gray .ScrollbarsCustom-Thumb.dragging {
+  background: var(--col-gray-700) !important;
+}
+
 /* Confetti burst (triggered on harvest) */
 .confetti-burst {
   position: fixed;

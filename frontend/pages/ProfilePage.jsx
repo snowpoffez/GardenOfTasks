@@ -1,5 +1,6 @@
 import { UserCircleIcon, LeafIcon, CurrencyDollarIcon, StarIcon } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
+import GrayScrollbar from '../components/GrayScrollbar'
 
 export default function ProfilePage({ user, stats }) {
   const username = user?.username ?? 'Gardener'
@@ -8,9 +9,10 @@ export default function ProfilePage({ user, stats }) {
 
   return (
     <div
-      className="flex-1 overflow-auto"
+      className="flex-1 min-h-0 flex flex-col"
       style={{ backgroundColor: 'var(--col-bg-page)' }}
     >
+      <GrayScrollbar>
       <div className="max-w-xl mx-auto px-6 py-10">
         <div
           className="rounded-2xl p-8 shadow-lg border"
@@ -125,6 +127,7 @@ export default function ProfilePage({ user, stats }) {
           </p>
         </div>
       </div>
+      </GrayScrollbar>
     </div>
   )
 }

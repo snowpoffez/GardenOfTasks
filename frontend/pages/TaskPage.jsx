@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { PlusIcon } from '@phosphor-icons/react'
+import GrayScrollbar from '../components/GrayScrollbar'
 import DailyCard from '../components/tasks/DailyCard'
 import TodoItem from '../components/tasks/TodoItem'
 import AddTaskPickModal from '../components/modals/AddTaskPickModal'
@@ -9,7 +10,7 @@ import DailyFormModal from '../components/modals/DailyFormModal'
 import GenerateAITaskModal from '../components/modals/GenerateAITaskModal'
 
 const XP_FLOAT_MS = 1500
-const DAILY_SLIDE_MS = 2000
+const DAILY_SLIDE_MS = 1000
 
 function moveIndex(arr, fromIndex, toIndex) {
   if (fromIndex === toIndex) return arr
@@ -202,7 +203,8 @@ export default function TaskPage({
 
   return (
     <>
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 min-h-0 flex flex-col">
+        <GrayScrollbar>
         <div className="flex justify-end gap-2 pt-5 pb-2 pr-[5rem]">
           <button
             type="button"
@@ -326,6 +328,7 @@ export default function TaskPage({
 
           </div>
         </div>
+        </GrayScrollbar>
       </div>
 
       {addTaskModal === 'pick' && (

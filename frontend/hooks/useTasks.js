@@ -22,9 +22,9 @@ export function useTasks(addGrowth, userId, onEarnXp) {
           title: t.task_name,
           notes: t.description,
           completed: t.status === 'completed',
-          rewardAmount: t.xp,
-          dueDate: '', // Backend doesn't support due dates yet
-          checklistItems: [], // Backend doesn't support subtasks yet
+          rewardAmount: t.xp != null ? Math.floor(t.xp / 10) : 3,
+          dueDate: t.due_date ?? '',
+          checklistItems: [],
           accentColor: DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)],
         })))
       })
@@ -46,7 +46,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
                 repeatEvery: d.repeat_every ?? 1,
                 repeatUnit: d.repeat_unit || 'day',
                 dueDate: d.due_date || '',
-                count: 0,
+                count: d.streak ?? 0,
             }))
             setDailies(mapped)
             setDailyOrderIds(mapped.map((d) => d.id))
@@ -70,7 +70,15 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       addGrowth(1)
     }
 
-    setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
+    setDailies((prev) => prev.map((d) => {
+      if (d.id !== dailyId) return d
+      const count = d.count ?? 0
+      return {
+        ...d,
+        checked: newChecked,
+        count: newChecked ? count + 1 : Math.max(0, count - 1),
+      }
+    }))
 
     if (newChecked) {
       setDailyOrderIds((prev) => {
@@ -160,6 +168,25 @@ export function useTasks(addGrowth, userId, onEarnXp) {
 
   const editDaily = useCallback((data) => {
     if (!editingDailyId) return
+    const dbId = String(editingDailyId).replace('daily-', '')
+    const payload = {
+      task_name: data.title ?? undefined,
+      description: data.notes ?? undefined,
+      xp: data.rewardAmount != null ? (data.rewardAmount * 10) : undefined,
+      accent_color: data.accentColor ?? undefined,
+      repeat_interval: data.repeatInterval ?? undefined,
+      repeat_every: data.repeatEvery ?? undefined,
+      repeat_unit: data.repeatUnit ?? undefined,
+      due_date: data.dueDate ?? undefined,
+    }
+    const cleaned = Object.fromEntries(Object.entries(payload).filter(([, v]) => v !== undefined))
+    if (userId && !isNaN(dbId) && Object.keys(cleaned).length > 0) {
+      fetch(`/api/dailies/${dbId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cleaned),
+      }).catch((err) => console.error('Failed to update daily:', err))
+    }
     setDailies((prev) => prev.map((d) => d.id === editingDailyId ? {
       ...d,
       title: data.title ?? d.title,
@@ -173,7 +200,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       repeatUnit: data.repeatUnit ?? d.repeatUnit,
     } : d))
     setEditingDailyId(null)
-  }, [editingDailyId])
+  }, [editingDailyId, userId])
 
   const resetDailies = useCallback(() => {
     setDailies((prev) => prev.map((d) => ({ ...d, checked: false })))
@@ -267,6 +294,21 @@ export function useTasks(addGrowth, userId, onEarnXp) {
 
   const editTodo = useCallback((data) => {
     if (!editingTodoId) return
+    const dbId = String(editingTodoId).replace('todo-', '') || String(editingTodoId)
+    const payload = {
+      task_name: data.title ?? undefined,
+      description: data.notes ?? undefined,
+      xp: data.rewardAmount != null ? (data.rewardAmount * 10) : undefined,
+      due_date: data.dueDate ?? undefined,
+    }
+    const cleaned = Object.fromEntries(Object.entries(payload).filter(([, v]) => v !== undefined))
+    if (userId && !isNaN(dbId) && Object.keys(cleaned).length > 0) {
+      fetch(`/api/tasks/${dbId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cleaned),
+      }).catch((err) => console.error('Failed to update task:', err))
+    }
     setTodos((prev) => prev.map((t) => t.id === editingTodoId ? {
       ...t,
       title: data.title || t.title,
@@ -278,7 +320,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       checklistItems: data.checklistItems ?? t.checklistItems ?? [],
     } : t))
     setEditingTodoId(null)
-  }, [editingTodoId])
+  }, [editingTodoId, userId])
 
   const deleteTodo = useCallback((id) => {
     setTodos((prev) => prev.filter((t) => t.id !== id))

@@ -1,4 +1,5 @@
 import { GearIcon, BellIcon, PaletteIcon, CalendarIcon, ShieldIcon } from '@phosphor-icons/react'
+import GrayScrollbar from '../components/GrayScrollbar'
 
 function SettingsSection({ icon: Icon, title, children }) {
   return (
@@ -46,9 +47,10 @@ function SettingsRow({ label, description, control, isFirst = false }) {
 export default function SettingsPage() {
   return (
     <div
-      className="flex-1 overflow-auto"
+      className="flex-1 min-h-0 flex flex-col"
       style={{ backgroundColor: 'var(--col-bg-page)' }}
     >
+      <GrayScrollbar>
       <div className="max-w-2xl mx-auto px-6 py-10">
         <h1 className="text-2xl font-bold mb-8" style={{ color: 'var(--col-text-heading)' }}>
           Settings
@@ -124,6 +126,7 @@ export default function SettingsPage() {
           />
         </SettingsSection>
       </div>
+      </GrayScrollbar>
     </div>
   )
 }

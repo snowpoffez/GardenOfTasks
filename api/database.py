@@ -34,9 +34,11 @@ def init_db():
                         task_name TEXT NOT NULL,
                         description TEXT,
                         xp INTEGER DEFAULT 0,
-                        status TEXT DEFAULT 'todo'
+                        status TEXT DEFAULT 'todo',
+                        due_date TEXT
                     );
                 """)
+                cur.execute("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date TEXT;")
 
                 print("✅ Tables initialized.")
 
@@ -50,6 +52,7 @@ def init_db():
                         xp INTEGER DEFAULT 0,
                         status TEXT DEFAULT 'todo',
                         checked BOOLEAN DEFAULT FALSE,
+                        streak INTEGER DEFAULT 0,
                         accent_color TEXT,
                         repeat_interval TEXT DEFAULT 'Daily',
                         repeat_every INTEGER DEFAULT 1,
@@ -57,6 +60,7 @@ def init_db():
                         due_date TEXT
                     );
                 """)
+                cur.execute("ALTER TABLE dailies ADD COLUMN IF NOT EXISTS streak INTEGER DEFAULT 0;")
 
                 cur.execute("""
                     CREATE TABLE IF NOT EXISTS plants (
@@ -218,9 +222,8 @@ def get_user_tasks(user_id: int):
     try:
         with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
             with conn.cursor() as cur:
-                # Get all tasks for that user
                 cur.execute(
-                    "SELECT id, task_name, description, xp, status FROM tasks WHERE user_id = %s",
+                    "SELECT id, task_name, description, xp, status, due_date FROM tasks WHERE user_id = %s",
                     (user_id,)
                 )
                 return cur.fetchall()
@@ -274,7 +277,9 @@ def get_user_dailies(user_id: int):
         with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, task_name, description, xp, status, checked FROM dailies WHERE user_id = %s",
+                    """SELECT id, task_name, description, xp, status, checked, streak,
+                       accent_color, repeat_interval, repeat_every, repeat_unit, due_date
+                       FROM dailies WHERE user_id = %s""",
                     (user_id,)
                 )
                 return cur.fetchall()
@@ -285,28 +290,42 @@ def get_user_dailies(user_id: int):
 def update_daily_partial(daily_id: int, updates: dict):
     """
     Dynamically updates parts of a daily.
-    'updates' is a dict like {"task_name": "New Name", "xp": 20}
+    When 'checked' is updated: checking sets streak = streak + 1, unchecking sets streak = max(0, streak - 1).
     """
     if not updates:
         return {"message": "No updates provided"}
 
-    # Build the SET part of the SQL query dynamically
-    # e.g., "task_name = %s, xp = %s"
-    set_clause = ", ".join([f"{column} = %s" for column in updates.keys()])
-    values = list(updates.values())
-    values.append(daily_id)  # Add ID for the WHERE clause
-
     try:
         with psycopg.connect(DATABASE_URL) as conn:
             with conn.cursor() as cur:
+                # If updating checked, compute new streak and add to updates
+                if "checked" in updates:
+                    cur.execute(
+                        "SELECT checked, streak FROM dailies WHERE id = %s",
+                        (daily_id,)
+                    )
+                    row = cur.fetchone()
+                    if not row:
+                        raise ValueError("Daily not found")
+                    old_checked, streak = row["checked"], row["streak"] or 0
+                    new_checked = updates["checked"]
+                    if new_checked:
+                        updates = {**updates, "streak": streak + 1}
+                    else:
+                        updates = {**updates, "streak": max(0, streak - 1)}
+
+                set_clause = ", ".join([f"{column} = %s" for column in updates.keys()])
+                values = list(updates.values())
+                values.append(daily_id)
+
                 cur.execute(
                     f"UPDATE dailies SET {set_clause} WHERE id = %s",
                     values
                 )
-                
+
                 if cur.rowcount == 0:
                     raise ValueError("Daily not found")
-                
+
                 return {"success": True, "message": "Daily updated successfully"}
     except Exception as e:
         print(f"Update Error: {e}")

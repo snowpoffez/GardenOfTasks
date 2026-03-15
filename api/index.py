@@ -49,6 +49,7 @@ class TaskUpdate(BaseModel):
     description: str | None = None
     xp: int | None = None
     status: str | None = None
+    due_date: str | None = None
 
 class DailyUpdate(BaseModel):
     task_name: str | None = None
@@ -56,6 +57,11 @@ class DailyUpdate(BaseModel):
     xp: int | None = None
     status: str | None = None
     checked: bool | None = None
+    accent_color: str | None = None
+    repeat_interval: str | None = None
+    repeat_every: int | None = None
+    repeat_unit: str | None = None
+    due_date: str | None = None
 
 class CurrencyRequest(BaseModel):
     amount: int
