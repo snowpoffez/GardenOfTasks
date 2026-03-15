@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CaretDown, CaretRight, Package, TrendUp } from '@phosphor-icons/react'
 import { formatCoins } from '../constants/garden'
-import ConfettiBurst from '../components/ConfettiBurst'
 
 const QUEUE_GLOW_COUNT = 3
 const XP_FLOAT_MS = 1500
@@ -21,7 +20,6 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
   const [upgradesOpen, setUpgradesOpen] = useState(false)
   const [shopOpen, setShopOpen] = useState(false)
   const [slotClickedForShop, setSlotClickedForShop] = useState(null)
-  const [confettiTrigger, setConfettiTrigger] = useState(0)
 
   const getSeed = (seedId) => seedsCatalog.find((s) => s.id === seedId)
   const emptySlotsCount = slots.filter((s) => !s).length
@@ -40,7 +38,6 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
     if (plant) {
       const seed = getSeed(plant.seedId)
       if (seed && plant.currentStage >= seed.stages) {
-        setConfettiTrigger((k) => k + 1)
         onHarvest(slotIndex)
       }
       return
@@ -109,7 +106,6 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
 
   return (
     <div className="flex-1 min-h-0 flex flex-col sm:flex-row gap-6 p-6 overflow-auto relative">
-      <ConfettiBurst trigger={confettiTrigger} />
       {showDeselectOverlay && (
         <div className="garden-full-overlay" onClick={handleDeselect} aria-hidden />
       )}

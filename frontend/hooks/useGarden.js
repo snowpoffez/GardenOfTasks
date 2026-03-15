@@ -3,7 +3,7 @@ import { SEEDS_CATALOG, GARDEN_GRID_SIZE, HARVEST_PROFIT, MAX_GARDEN_SLOTS, getG
 
 export function useGarden(userId) {
   const [garden, setGarden] = useState(() => ({
-    coins: 0,
+    coins: 1e15,
     slots: Array(GARDEN_GRID_SIZE).fill(null),
     growthQueue: [],
     lastGrownSlots: [],
