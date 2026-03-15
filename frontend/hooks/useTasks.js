@@ -56,11 +56,13 @@ export function useTasks(addGrowth, userId, onEarnXp) {
 
   // --- Daily actions ---
 
-  const toggleDaily = useCallback((dailyId) => {
-    if (!dailyId || typeof dailyId !== 'string') return
+  const dailiesRef = useRef(dailies)
+  useEffect(() => { dailiesRef.current = dailies }, [dailies])
 
-    const daily = dailies.find((d) => d.id === dailyId)
+  const toggleDaily = useCallback((dailyId) => {
+    const daily = dailiesRef.current.find((d) => d.id === dailyId)
     if (!daily) return
+
     const newChecked = !daily.checked
 
     if (newChecked) {
@@ -68,37 +70,39 @@ export function useTasks(addGrowth, userId, onEarnXp) {
       addGrowth(1)
     }
 
-    setDailies((prev) => prev.map((d) => (d.id === dailyId ? { ...d, checked: newChecked } : d)))
+    setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
 
-    setDailyOrderIds((prev) => {
-      const idx = prev.indexOf(dailyId)
-      if (newChecked) {
+    if (newChecked) {
+      setDailyOrderIds((prev) => {
+        const idx = prev.indexOf(dailyId)
         if (idx === -1) return [...prev, dailyId]
         checkedFromIndexRef.current[dailyId] = idx
         const next = prev.filter((id) => id !== dailyId)
         next.push(dailyId)
         return next
-      }
+      })
+    } else {
       const fromIndex = checkedFromIndexRef.current[dailyId]
       if (fromIndex != null) {
+        setDailyOrderIds((prev) => {
+          const without = prev.filter((id) => id !== dailyId)
+          const insertAt = Math.min(fromIndex, without.length)
+          without.splice(insertAt, 0, dailyId)
+          return without
+        })
         delete checkedFromIndexRef.current[dailyId]
-        const without = prev.filter((id) => id !== dailyId)
-        const insertAt = Math.min(fromIndex, without.length)
-        without.splice(insertAt, 0, dailyId)
-        return without
       }
-      return prev
-    })
+    }
 
-    const dbId = dailyId.replace(/^daily-/, '')
-    if (userId && dbId && !isNaN(Number(dbId))) {
+    const dbId = dailyId.toString().replace('daily-', '')
+    if (userId && !isNaN(dbId)) {
       fetch(`/api/dailies/${dbId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ checked: newChecked }),
       }).catch((err) => console.error('Failed to update daily:', err))
     }
-  }, [dailies, addGrowth, onEarnXp, userId])
+  }, [addGrowth, onEarnXp, userId])
 
   const addDaily = useCallback(async (data) => {
     const accentColor = DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)]
