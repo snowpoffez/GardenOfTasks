@@ -202,7 +202,7 @@ export default function TaskPage({
 
   return (
     <>
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="flex-1 overflow-auto">
         <div className="flex justify-end gap-2 pt-5 pb-2 pr-[5rem]">
           <button
             type="button"
@@ -221,12 +221,12 @@ export default function TaskPage({
           </button>
         </div>
 
-        <div className="flex flex-1 justify-center px-[5rem] pb-6 min-h-0">
-          <div className="w-5/6 flex gap-8 min-h-0">
+        <div className="flex justify-center px-[5rem] pb-6">
+          <div className="w-5/6 flex gap-8">
 
             {/* Dailies column */}
-            <section className="flex-1 flex flex-col min-w-0 min-h-0">
-              <div className="flex items-center gap-2 mb-3 shrink-0">
+            <section className="flex-1 flex flex-col min-w-0">
+              <div className="flex items-center gap-2 mb-3">
                 <h2 className="text-xl font-semibold" style={{ color: 'var(--col-text-heading)' }}>Dailies</h2>
                 <span
                   className="w-5 h-5 rounded-full text-white text-xs flex items-center justify-center font-medium"
@@ -235,36 +235,34 @@ export default function TaskPage({
                   {incompleteDailyCount}
                 </span>
               </div>
-              <div className="flex-1 min-h-0 overflow-y-auto">
-                <div className="space-y-3 pb-2">
-                  {displayedDailies.map((d, index) => (
-                    <div
-                      key={d.id}
-                      ref={(el) => { setDailyRef(d.id, el); setCardRef(d.id, el) }}
-                      draggable
-                      onDragStart={(e) => {
-                        e.dataTransfer.effectAllowed = 'move'
-                        e.dataTransfer.setData('text/plain', String(index))
-                      }}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault()
-                        const from = parseInt(e.dataTransfer.getData('text/plain'), 10)
-                        if (Number.isNaN(from)) return
-                        onReorderDailies?.(displayedDailies.map((x) => x.id), from, index)
-                      }}
-                      className="task-card-enter cursor-grab active:cursor-grabbing"
-                      style={{ animationDelay: `${index * 45}ms` }}
-                    >
-                      <DailyCard daily={d} onToggle={handleDailyToggle} onEdit={onOpenEditDaily} />
-                    </div>
-                  ))}
-                </div>
+              <div className="space-y-3 pb-2">
+                {displayedDailies.map((d, index) => (
+                  <div
+                    key={d.id}
+                    ref={(el) => { setDailyRef(d.id, el); setCardRef(d.id, el) }}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = 'move'
+                      e.dataTransfer.setData('text/plain', String(index))
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault()
+                      const from = parseInt(e.dataTransfer.getData('text/plain'), 10)
+                      if (Number.isNaN(from)) return
+                      onReorderDailies?.(displayedDailies.map((x) => x.id), from, index)
+                    }}
+                    className="task-card-enter cursor-grab active:cursor-grabbing"
+                    style={{ animationDelay: `${index * 45}ms` }}
+                  >
+                    <DailyCard daily={d} onToggle={handleDailyToggle} onEdit={onOpenEditDaily} />
+                  </div>
+                ))}
               </div>
             </section>
 
             {/* To Do's column */}
-            <section className="flex-1 flex flex-col min-w-0 min-h-0">
+            <section className="flex-1 flex flex-col min-w-0">
               <div className="flex items-center gap-2 mb-3">
                 <h2 className="text-xl font-semibold" style={{ color: 'var(--col-text-heading)' }}>To Do&apos;s</h2>
                 <span
@@ -291,7 +289,7 @@ export default function TaskPage({
                   </button>
                 ))}
               </div>
-              <div className="flex-1 min-h-[160px] overflow-auto">
+              <div className="min-h-[160px]">
                 {displayedTodos.length === 0 ? (
                   <div className="min-h-[160px] rounded-lg mt-1" style={{ backgroundColor: 'var(--col-bg-empty)' }} />
                 ) : (
