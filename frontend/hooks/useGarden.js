@@ -1,17 +1,30 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import { SEEDS_CATALOG, GARDEN_GRID_SIZE, HARVEST_PROFIT, MAX_GARDEN_SLOTS, getGridUpgradeCost, UPGRADES_CATALOG } from '../constants/garden'
 
 export function useGarden(userId) {
   const [garden, setGarden] = useState(() => ({
-    coins: 1e15,
+    coins: 0,
     slots: Array(GARDEN_GRID_SIZE).fill(null),
     growthQueue: [],
     lastGrownSlots: [],
   }))
+  const [currencyLoaded, setCurrencyLoaded] = useState(!userId)
+  const prevUserIdRef = useRef(userId)
+
+  useLayoutEffect(() => {
+    if (prevUserIdRef.current !== userId) {
+      prevUserIdRef.current = userId
+      setCurrencyLoaded(!userId)
+    }
+  }, [userId])
 
   // Load currency from DB when user logs in
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+      setCurrencyLoaded(true)
+      return
+    }
+    setCurrencyLoaded(false)
     fetch(`/api/users/${userId}/currency`)
       .then((r) => r.json())
       .then((data) => {
@@ -19,6 +32,7 @@ export function useGarden(userId) {
         setGarden((prev) => ({ ...prev, coins: currency }))
       })
       .catch((err) => console.error('Failed to load currency:', err))
+      .finally(() => setCurrencyLoaded(true))
   }, [userId])
 
   const addGrowth = useCallback((amount) => {
@@ -118,5 +132,5 @@ export function useGarden(userId) {
     }
   }, [userId])
 
-  return { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots }
+  return { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots, currencyLoaded }
 }

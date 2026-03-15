@@ -10,10 +10,26 @@ export function useTasks(addGrowth, userId, onEarnXp) {
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
   const [editingTodoId, setEditingTodoId] = useState(null)
   const [editingDailyId, setEditingDailyId] = useState(null)
+  const [tasksLoaded, setTasksLoaded] = useState(!userId)
+  const [dailiesLoaded, setDailiesLoaded] = useState(!userId)
+  const prevUserIdRef = useRef(userId)
+
+  useLayoutEffect(() => {
+    if (prevUserIdRef.current !== userId) {
+      prevUserIdRef.current = userId
+      const ready = !userId
+      setTasksLoaded(ready)
+      setDailiesLoaded(ready)
+    }
+  }, [userId])
 
   // Load tasks from backend on userId change (e.g. login/logout)
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+      setTasksLoaded(true)
+      return
+    }
+    setTasksLoaded(false)
     fetch(`/api/tasks/${userId}`)
       .then((res) => res.json())
       .then((tasks) => {
@@ -28,11 +44,17 @@ export function useTasks(addGrowth, userId, onEarnXp) {
           accentColor: DAILY_ACCENT_COLORS[Math.floor(Math.random() * DAILY_ACCENT_COLORS.length)],
         })))
       })
+      .catch((err) => console.error('Failed to load tasks:', err))
+      .finally(() => setTasksLoaded(true))
   }, [userId])
 
   // Load dailies from backend on userId change (e.g. login/logout)
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+      setDailiesLoaded(true)
+      return
+    }
+    setDailiesLoaded(false)
     fetch(`/api/dailies/${userId}`)
         .then(res => res.json())
         .then(dailies => {
@@ -52,6 +74,7 @@ export function useTasks(addGrowth, userId, onEarnXp) {
             setDailyOrderIds(mapped.map((d) => d.id))
         })
         .catch(err => console.error('Failed to load dailies:', err))
+        .finally(() => setDailiesLoaded(true))
   }, [userId])
 
   // --- Daily actions ---
@@ -346,6 +369,8 @@ export function useTasks(addGrowth, userId, onEarnXp) {
     dailies, dailyOrderIds, todos, todoTab, setTodoTab,
     addTaskModal, setAddTaskModal,
     editingTodoId, editingDailyId,
+    tasksLoaded,
+    dailiesLoaded,
     // actions
     toggleDaily, addDaily, editDaily, deleteDaily, resetDailies, reorderDailies,
     toggleTodo, addTodo, editTodo, deleteTodo, reorderTodos,

@@ -47,15 +47,26 @@ function App() {
   const [authView, setAuthView] = useState('home') // 'home' | 'login'
   const [user, setUser] = useState(null) // { username } when logged in
 
-  const { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots } = useGarden(user?.user_id)
+  const { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots, currencyLoaded } = useGarden(user?.user_id)
+  const [statsLoaded, setStatsLoaded] = useState(!user?.user_id)
+  const prevUidRef = useRef(user?.user_id)
+
+  useLayoutEffect(() => {
+    if (prevUidRef.current !== user?.user_id) {
+      prevUidRef.current = user?.user_id
+      setStatsLoaded(!user?.user_id)
+    }
+  }, [user?.user_id])
 
   // Load level and XP from DB when user logs in
   useEffect(() => {
     const uid = user?.user_id
     if (!uid) {
       setStats(initialStats)
+      setStatsLoaded(true)
       return
-    } 
+    }
+    setStatsLoaded(false)
     Promise.all([
       fetch(`/api/users/${uid}/level`).then((r) => r.json()),
       fetch(`/api/users/${uid}/xp`).then((r) => r.json()),
@@ -71,6 +82,7 @@ function App() {
         }))
       })
       .catch((err) => console.error('Failed to load level/xp:', err))
+      .finally(() => setStatsLoaded(true))
   }, [user?.user_id])
 
   const statsRef = useRef(stats)
@@ -109,6 +121,7 @@ function App() {
   const clearLastEarnedXp = useCallback(() => setLastEarnedXp(null), [])
 
   const tasks = useTasks(addGrowth, user?.user_id, addXp)
+  const initialDataReady = currencyLoaded && tasks.tasksLoaded && tasks.dailiesLoaded && statsLoaded
 
   // When a harvest-ready crop appears, signal TaskPage to navigate after its animation.
   const prevGrownSlotsRef = useRef(garden.lastGrownSlots ?? [])
@@ -166,6 +179,19 @@ function App() {
         {authView === 'login' && (
           <LoginPage onLoginSuccess={handleLoginSuccess} onBack={() => setAuthView('home')} />
         )}
+      </div>
+    )
+  }
+
+  if (loggedIn && !initialDataReady) {
+    return (
+      <div className="app-page h-full flex flex-col">
+        <div className="loading-screen">
+          <div className="loading-screen-content">
+            <div className="loading-spinner" aria-hidden />
+            <p className="loading-screen-text">Loading your garden…</p>
+          </div>
+        </div>
       </div>
     )
   }
