@@ -57,38 +57,41 @@ export function useTasks(addGrowth, userId, onEarnXp) {
   // --- Daily actions ---
 
   const toggleDaily = useCallback((dailyId) => {
+    if (!dailyId || typeof dailyId !== 'string') return
+
     const daily = dailies.find((d) => d.id === dailyId)
-    if (daily && !daily.checked) {
+    if (!daily) return
+    const newChecked = !daily.checked
+
+    if (newChecked) {
       onEarnXp?.(daily.rewardAmount ?? daily.damageAmount ?? 5)
       addGrowth(1)
     }
 
-    const newChecked = daily ? !daily.checked : false
-    setDailies((prev) => prev.map((d) => d.id === dailyId ? { ...d, checked: newChecked } : d))
-    if (newChecked) {
-      setDailyOrderIds((prev) => {
-        const idx = prev.indexOf(dailyId)
+    setDailies((prev) => prev.map((d) => (d.id === dailyId ? { ...d, checked: newChecked } : d)))
+
+    setDailyOrderIds((prev) => {
+      const idx = prev.indexOf(dailyId)
+      if (newChecked) {
         if (idx === -1) return [...prev, dailyId]
         checkedFromIndexRef.current[dailyId] = idx
         const next = prev.filter((id) => id !== dailyId)
         next.push(dailyId)
         return next
-      })
-    } else {
+      }
       const fromIndex = checkedFromIndexRef.current[dailyId]
       if (fromIndex != null) {
-        setDailyOrderIds((prev) => {
-          const without = prev.filter((id) => id !== dailyId)
-          const insertAt = Math.min(fromIndex, without.length)
-          without.splice(insertAt, 0, dailyId)
-          return without
-        })
         delete checkedFromIndexRef.current[dailyId]
+        const without = prev.filter((id) => id !== dailyId)
+        const insertAt = Math.min(fromIndex, without.length)
+        without.splice(insertAt, 0, dailyId)
+        return without
       }
-    }
+      return prev
+    })
 
-    const dbId = dailyId.toString().replace('daily-', '')
-    if (userId && !isNaN(dbId)) {
+    const dbId = dailyId.replace(/^daily-/, '')
+    if (userId && dbId && !isNaN(Number(dbId))) {
       fetch(`/api/dailies/${dbId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
