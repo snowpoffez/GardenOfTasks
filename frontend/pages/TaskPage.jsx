@@ -89,6 +89,7 @@ function useFlipList(ids) {
             el.style.transition = ''
             el.style.transform = ''
             el.style.willChange = ''
+            el.style.animation = ''
           }
           el.addEventListener('transitionend', onEnd, { once: true })
         }

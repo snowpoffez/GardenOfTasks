@@ -275,11 +275,13 @@ button, [role="button"], select, .modal-overlay {
 }
 /* Staggered entrance when list appears */
 .task-card-enter {
-  opacity: 0;
-  transform: translateY(8px);
-  animation: task-card-enter 0.35s ease-out forwards;
+  animation: task-card-enter 0.35s ease-out both;
 }
 @keyframes task-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
