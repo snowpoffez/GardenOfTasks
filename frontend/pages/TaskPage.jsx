@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react'
+import { useMemo, useEffect, useEffect, useRef, useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { PlusIcon } from '@phosphor-icons/react'
 import GrayScrollbar from '../components/GrayScrollbar'
@@ -59,7 +59,7 @@ function useFlipList(ids) {
     snapRef.current = snap
   }, [])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const snap = snapRef.current
     if (!snap) return
     snapRef.current = null
