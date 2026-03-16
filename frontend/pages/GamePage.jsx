@@ -244,7 +244,8 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
               <p className="text-sm mb-3" style={{ color: 'var(--col-text-muted)' }}>
                 Pick a seed, then tap an empty plot to plant. Complete tasks in The Greenhouse to grow.
               </p>
-              <div className="garden-shop-seed-list flex flex-col gap-2">
+              <GrayScrollbar style={{ flex: '1 1 0', minHeight: 0 }}>
+              <div className="flex flex-col gap-2 pr-1">
                 {seedsCatalog.map((seed) => {
                   const canAfford = coins >= seed.cost
                   const isSelected = selectedSeedId === seed.id
@@ -267,6 +268,7 @@ export default function GamePage({ garden, seedsCatalog, upgradesCatalog, gridUp
                   )
                 })}
               </div>
+              </GrayScrollbar>
               {selectedSeedId && (
                 <p className="text-sm mt-3" style={{ color: 'var(--col-accent)' }}>
                   Click an empty plot to plant, or click elsewhere to cancel.

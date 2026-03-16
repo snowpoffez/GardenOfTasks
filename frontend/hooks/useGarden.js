@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { SEEDS_CATALOG, GARDEN_GRID_SIZE, HARVEST_PROFIT, MAX_GARDEN_SLOTS, getGridUpgradeCost, UPGRADES_CATALOG } from '../constants/garden'
 
 export function useGarden(userId) {
@@ -8,15 +8,7 @@ export function useGarden(userId) {
     growthQueue: [],
     lastGrownSlots: [],
   }))
-  const [currencyLoaded, setCurrencyLoaded] = useState(!userId)
-  const prevUserIdRef = useRef(userId)
-
-  useLayoutEffect(() => {
-    if (prevUserIdRef.current !== userId) {
-      prevUserIdRef.current = userId
-      setCurrencyLoaded(!userId)
-    }
-  }, [userId])
+  const [currencyLoaded, setCurrencyLoaded] = useState(false)
 
   // Load currency from DB when user logs in
   useEffect(() => {

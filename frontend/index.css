@@ -763,30 +763,6 @@ button, [role="button"], select, .modal-overlay {
 .garden-shop-box > p:first-of-type {
   margin-bottom: 0.5rem;
 }
-.garden-shop-seed-list {
-  max-height: min(10rem, 26vh);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 0.25rem;
-  margin-right: -0.25rem;
-}
-.garden-shop-seed-list::-webkit-scrollbar {
-  width: 8px;
-}
-.garden-shop-seed-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-.garden-shop-seed-list::-webkit-scrollbar-thumb {
-  background: var(--col-green-500);
-  border-radius: 4px;
-}
-.garden-shop-seed-list::-webkit-scrollbar-thumb:hover {
-  background: var(--col-green-600);
-}
-.garden-shop-seed-list {
-  scrollbar-width: thin;
-  scrollbar-color: var(--col-green-500) transparent;
-}
 .garden-shop-card {
   border-radius: 0.5rem;
   border: 1px solid var(--col-border);

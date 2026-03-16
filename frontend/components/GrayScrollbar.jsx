@@ -1,8 +1,10 @@
 import { Scrollbar } from 'react-scrollbars-custom'
 
+const TRANSPARENT = { background: 'transparent' }
+
 /**
  * Scrollbar that fills its flex container and uses gray track/thumb styling.
- * Use as a flex child with flex-1 min-h-0 (or inside such a container).
+ * Wrapper and scroller backgrounds are forced transparent so the page background shows through.
  * From https://xobotyi.github.io/react-scrollbars-custom/
  */
 export default function GrayScrollbar({ children, className = '', style = {}, ...props }) {
@@ -11,6 +13,9 @@ export default function GrayScrollbar({ children, className = '', style = {}, ..
       <Scrollbar
         style={{ position: 'absolute', inset: 0 }}
         className="scrollbars-gray"
+        wrapperProps={{ style: TRANSPARENT }}
+        scrollerProps={{ style: TRANSPARENT }}
+        contentProps={{ style: TRANSPARENT }}
         {...props}
       >
         {children}

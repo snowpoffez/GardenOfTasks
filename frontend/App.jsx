@@ -48,15 +48,7 @@ function App() {
   const [user, setUser] = useState(null) // { username } when logged in
 
   const { garden, addGrowth, plantSeed, harvest, buyUpgrade, clearLastGrownSlots, currencyLoaded } = useGarden(user?.user_id)
-  const [statsLoaded, setStatsLoaded] = useState(!user?.user_id)
-  const prevUidRef = useRef(user?.user_id)
-
-  useLayoutEffect(() => {
-    if (prevUidRef.current !== user?.user_id) {
-      prevUidRef.current = user?.user_id
-      setStatsLoaded(!user?.user_id)
-    }
-  }, [user?.user_id])
+  const [statsLoaded, setStatsLoaded] = useState(false)
 
   // Load level and XP from DB when user logs in
   useEffect(() => {
@@ -121,7 +113,10 @@ function App() {
   const clearLastEarnedXp = useCallback(() => setLastEarnedXp(null), [])
 
   const tasks = useTasks(addGrowth, user?.user_id, addXp)
-  const initialDataReady = currencyLoaded && tasks.tasksLoaded && tasks.dailiesLoaded && statsLoaded
+  // Only consider data ready when a user is logged in AND all fetches have completed.
+  // The extra `!!user?.user_id` guard prevents stale `true` flags (set during logout)
+  // from bypassing the loading screen on a second login before effects re-fire.
+  const initialDataReady = !!user?.user_id && currencyLoaded && tasks.tasksLoaded && tasks.dailiesLoaded && statsLoaded
 
   // When a harvest-ready crop appears, signal TaskPage to navigate after its animation.
   const prevGrownSlotsRef = useRef(garden.lastGrownSlots ?? [])

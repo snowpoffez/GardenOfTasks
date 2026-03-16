@@ -10,18 +10,8 @@ export function useTasks(addGrowth, userId, onEarnXp) {
   const [addTaskModal, setAddTaskModal] = useState(null) // null | 'pick' | 'daily' | 'todo' | 'generate-ai'
   const [editingTodoId, setEditingTodoId] = useState(null)
   const [editingDailyId, setEditingDailyId] = useState(null)
-  const [tasksLoaded, setTasksLoaded] = useState(!userId)
-  const [dailiesLoaded, setDailiesLoaded] = useState(!userId)
-  const prevUserIdRef = useRef(userId)
-
-  useLayoutEffect(() => {
-    if (prevUserIdRef.current !== userId) {
-      prevUserIdRef.current = userId
-      const ready = !userId
-      setTasksLoaded(ready)
-      setDailiesLoaded(ready)
-    }
-  }, [userId])
+  const [tasksLoaded, setTasksLoaded] = useState(false)
+  const [dailiesLoaded, setDailiesLoaded] = useState(false)
 
   // Load tasks from backend on userId change (e.g. login/logout)
   useEffect(() => {
